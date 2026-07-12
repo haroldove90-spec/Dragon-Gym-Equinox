@@ -19,6 +19,8 @@ import ProgramView from './components/ProgramView';
 import ClassDetail from './components/ClassDetail';
 import ActiveWorkout from './components/ActiveWorkout';
 import CheckInCard from './components/CheckInCard';
+import AdminPortal from './components/AdminPortal';
+import StaffPortal from './components/StaffPortal';
 
 import { GymClass, Program, ProgramSession, Article, UserProfile } from './types';
 import { mockUserProfile, mockClasses, mockPrograms, mockArticles } from './data';
@@ -46,6 +48,17 @@ export default function App() {
   const [activeSession, setActiveSession] = useState<ProgramSession | null>(null);
   const [activeArticle, setActiveArticle] = useState<Article | null>(null);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [showAdminPortal, setShowAdminPortal] = useState(false);
+  const [showStaffPortal, setShowStaffPortal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const triggerNotification = (message: string) => {
+    setToastMessage(message);
+    const timeoutId = setTimeout(() => {
+      setToastMessage((prev) => (prev === message ? null : prev));
+    }, 3500);
+    return () => clearTimeout(timeoutId);
+  };
 
   // --- Synchronize changes with localStorage ---
   useEffect(() => {
@@ -227,6 +240,12 @@ export default function App() {
                 onOpenCheckIn={() => setShowCheckInModal(true)}
                 onNavigateToExplore={() => setActiveTab('explore')}
                 onOpenArticle={(art) => setActiveArticle(art)}
+                onOpenAdminPortal={() => setShowAdminPortal(true)}
+                onOpenStaffPortal={() => setShowStaffPortal(true)}
+                onOpenSocioPortal={() => {
+                  setShowCheckInModal(true);
+                  triggerNotification("Portal Socio: Abre tu pase digital de club o agenda sesiones");
+                }}
               />
             </motion.div>
           )}
@@ -521,6 +540,65 @@ export default function App() {
             onClose={() => setShowCheckInModal(false)}
             onConfirmCheckIn={handleConfirmCheckIn}
           />
+        )}
+      </AnimatePresence>
+
+      {/* --- ADMIN PORTAL OVERLAY --- */}
+      <AnimatePresence>
+        {showAdminPortal && (
+          <AdminPortal
+            classes={classes}
+            user={user}
+            onClose={() => setShowAdminPortal(false)}
+            onAddClass={(newClass) => {
+              setClasses(prev => [newClass, ...prev]);
+              triggerNotification(`Clase "${newClass.title}" publicada en horarios!`);
+            }}
+            onDeleteClass={(classId) => {
+              setClasses(prev => prev.filter(c => c.id !== classId));
+              triggerNotification('Clase eliminada del horario del club.');
+            }}
+            onUpdateUser={(updatedUser) => {
+              setUser(updatedUser);
+              triggerNotification('Nivel de membresía de usuario actualizado!');
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* --- STAFF PORTAL OVERLAY --- */}
+      <AnimatePresence>
+        {showStaffPortal && (
+          <StaffPortal
+            classes={classes}
+            user={user}
+            onClose={() => setShowStaffPortal(false)}
+            onIncrementCheckIn={() => {
+              setUser(prev => {
+                const nextCount = prev.checkInCount + 1;
+                return {
+                  ...prev,
+                  checkInCount: nextCount > prev.checkInGoal ? prev.checkInGoal : nextCount
+                };
+              });
+            }}
+            onTriggerNotification={(msg) => triggerNotification(msg)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* --- TOAST NOTIFICATION OVERLAY --- */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-20 md:bottom-6 right-6 bg-neutral-900 border border-brand-gold/30 px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-2.5 max-w-sm backdrop-blur-md"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-ping" />
+            <p className="text-xs font-mono font-medium text-white">{toastMessage}</p>
+          </motion.div>
         )}
       </AnimatePresence>
 
