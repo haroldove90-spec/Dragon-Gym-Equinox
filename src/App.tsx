@@ -21,6 +21,7 @@ import ActiveWorkout from './components/ActiveWorkout';
 import CheckInCard from './components/CheckInCard';
 import AdminPortal from './components/AdminPortal';
 import StaffPortal from './components/StaffPortal';
+import SocioPortal from './components/SocioPortal';
 
 import { GymClass, Program, ProgramSession, Article, UserProfile } from './types';
 import { mockUserProfile, mockClasses, mockPrograms, mockArticles } from './data';
@@ -50,6 +51,7 @@ export default function App() {
   const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [showAdminPortal, setShowAdminPortal] = useState(false);
   const [showStaffPortal, setShowStaffPortal] = useState(false);
+  const [showSocioPortal, setShowSocioPortal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const triggerNotification = (message: string) => {
@@ -243,8 +245,8 @@ export default function App() {
                 onOpenAdminPortal={() => setShowAdminPortal(true)}
                 onOpenStaffPortal={() => setShowStaffPortal(true)}
                 onOpenSocioPortal={() => {
-                  setShowCheckInModal(true);
-                  triggerNotification("Portal Socio: Abre tu pase digital de club o agenda sesiones");
+                  setShowSocioPortal(true);
+                  triggerNotification("Portal Socio: Bienvenido de vuelta al club.");
                 }}
               />
             </motion.div>
@@ -582,6 +584,22 @@ export default function App() {
                 };
               });
             }}
+            onTriggerNotification={(msg) => triggerNotification(msg)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* --- SOCIO PORTAL OVERLAY --- */}
+      <AnimatePresence>
+        {showSocioPortal && (
+          <SocioPortal
+            classes={classes}
+            user={user}
+            onClose={() => setShowSocioPortal(false)}
+            onUpdateUser={(updatedUser) => {
+              setUser(updatedUser);
+            }}
+            onBookToggle={handleBookToggle}
             onTriggerNotification={(msg) => triggerNotification(msg)}
           />
         )}

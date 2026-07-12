@@ -262,6 +262,37 @@ export default function AdminPortal({
           </div>
         </div>
 
+        {/* HEADER NAVIGATION FOR DESKTOP (FULLSCREEN) */}
+        <div className="hidden md:flex items-center gap-2 bg-neutral-900/50 p-1 rounded-xl border border-neutral-800">
+          <button
+            onClick={() => setActiveTab('finanzas')}
+            className={`py-1.5 px-3.5 text-xs font-mono uppercase font-bold rounded-lg transition flex items-center gap-1.5 ${
+              activeTab === 'finanzas' ? 'bg-brand-gold text-black' : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            Finanzas
+          </button>
+          <button
+            onClick={() => setActiveTab('pos_planes')}
+            className={`py-1.5 px-3.5 text-xs font-mono uppercase font-bold rounded-lg transition flex items-center gap-1.5 ${
+              activeTab === 'pos_planes' ? 'bg-brand-gold text-black' : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            POS / Planes
+          </button>
+          <button
+            onClick={() => setActiveTab('personal_clases')}
+            className={`py-1.5 px-3.5 text-xs font-mono uppercase font-bold rounded-lg transition flex items-center gap-1.5 ${
+              activeTab === 'personal_clases' ? 'bg-brand-gold text-black' : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            Personal / Clases
+          </button>
+        </div>
+
         <button
           onClick={onClose}
           className="w-10 h-10 rounded-full bg-neutral-900 border border-neutral-850 hover:bg-neutral-800 transition flex items-center justify-center text-neutral-400 hover:text-white"
@@ -270,8 +301,8 @@ export default function AdminPortal({
         </button>
       </header>
 
-      {/* PORTAL SUITE TABS (ADMIN NAVIGATION SUITE) */}
-      <div className="shrink-0 bg-neutral-950 border-b border-neutral-900/50 flex overflow-x-auto no-scrollbar">
+      {/* PORTAL SUITE TABS (ADMIN NAVIGATION SUITE - HIDDEN ON MOBILE/TABLET because we use bottom navigation bar) */}
+      <div className="hidden shrink-0 bg-neutral-950 border-b border-neutral-900/50 overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab('finanzas')}
           className={`flex-1 py-4 px-3 text-center text-xs font-mono tracking-wider uppercase font-bold border-b-2 transition flex items-center justify-center gap-2 whitespace-nowrap ${
@@ -302,7 +333,7 @@ export default function AdminPortal({
       </div>
 
       {/* MAIN CONTAINER */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-24 md:pb-6">
         
         {/* =========================================================================
             TAB 1: DASHBOARD DE ANALÍTICAS Y FINANZAS
@@ -1190,12 +1221,45 @@ export default function AdminPortal({
       </div>
 
       {/* FOOTER SYNC STATUS */}
-      <footer className="shrink-0 bg-neutral-950/80 border-t border-neutral-900 px-6 py-4 flex justify-between items-center text-[9px] font-mono text-neutral-500">
+      <footer className="shrink-0 bg-neutral-950/80 border-t border-neutral-900 px-6 py-4 flex justify-between items-center text-[9px] font-mono text-neutral-500 pb-20 md:pb-4">
         <span className="flex items-center gap-1">
           <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" /> ACCESO SEGURO • GERENCIA GLOBAL
         </span>
         <span>MODULOS DE ADMINISTRADOR SEGUROS</span>
       </footer>
+
+      {/* PERSISTENT BOTTOM NAVIGATION BAR (Visible on mobile/tablet only) */}
+      <div className="fixed bottom-0 inset-x-0 bg-neutral-950/95 backdrop-blur-md border-t border-neutral-900/80 px-6 py-3 z-40 flex items-center justify-between md:hidden">
+        <button
+          onClick={() => setActiveTab('finanzas')}
+          className={`flex flex-col items-center gap-1 transition ${
+            activeTab === 'finanzas' ? 'text-brand-gold' : 'text-neutral-500 hover:text-neutral-400'
+          }`}
+        >
+          <Activity className="w-5 h-5" />
+          <span className="text-[9px] font-medium uppercase tracking-widest">Finanzas</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('pos_planes')}
+          className={`flex flex-col items-center gap-1 transition ${
+            activeTab === 'pos_planes' ? 'text-brand-gold' : 'text-neutral-500 hover:text-neutral-400'
+          }`}
+        >
+          <CreditCard className="w-5 h-5" />
+          <span className="text-[9px] font-medium uppercase tracking-widest">POS</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('personal_clases')}
+          className={`flex flex-col items-center gap-1 transition ${
+            activeTab === 'personal_clases' ? 'text-brand-gold' : 'text-neutral-500 hover:text-neutral-400'
+          }`}
+        >
+          <Users className="w-5 h-5" />
+          <span className="text-[9px] font-medium uppercase tracking-widest">Personal</span>
+        </button>
+      </div>
     </div>
   );
 }
