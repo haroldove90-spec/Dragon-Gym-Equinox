@@ -1,0 +1,6 @@
+{
+  "name": "Dragon GYM",
+  "description": "A high-fidelity mobile app clone of the premium Dragon GYM fitness experience, featuring class bookings, progress tracking, personalized programs, and digital check-ins.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
