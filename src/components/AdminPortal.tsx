@@ -296,8 +296,21 @@ export default function AdminPortal({
       </div>
 
       {/* PERSISTENT MOBILE BOTTOM NAVIGATION BAR FOR ADMIN */}
-      {/* Ensures target touch layout is at least 44px (using py-2.5, h-[68px], large hit zones) */}
-      <div className="fixed bottom-0 inset-x-0 bg-neutral-950/95 backdrop-blur-md border-t border-neutral-900 px-4 py-2.5 z-40 flex items-center gap-6 overflow-x-auto scrollbar-none md:hidden h-[68px]">
+      {/* Ensures target touch layout is at least 44px (using py-2, h-[72px], large hit zones) */}
+      <div className="fixed bottom-0 inset-x-0 bg-neutral-950/95 backdrop-blur-md border-t border-neutral-900 px-3 py-2 z-40 flex items-center gap-4.5 overflow-x-auto admin-scrollbar md:hidden h-[72px]">
+        <style>{`
+          .admin-scrollbar::-webkit-scrollbar {
+            height: 3px;
+          }
+          .admin-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 9px;
+          }
+          .admin-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 9px;
+          }
+        `}</style>
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -305,13 +318,13 @@ export default function AdminPortal({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center gap-1.5 transition shrink-0 px-2 h-12 ${
+              className={`flex flex-col items-center justify-center gap-1 transition shrink-0 px-2 h-12 ${
                 isActive ? 'text-brand-gold font-bold' : 'text-neutral-500 hover:text-neutral-400'
               }`}
               style={{ minHeight: '44px' }}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[9px] font-semibold uppercase tracking-wider whitespace-nowrap">{item.name}</span>
+              <span className="text-[8px] font-semibold uppercase tracking-wider whitespace-nowrap">{item.name}</span>
             </button>
           );
         })}
