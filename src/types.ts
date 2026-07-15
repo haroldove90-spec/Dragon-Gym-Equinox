@@ -73,3 +73,33 @@ export interface UserProfile {
   membershipLevel: string;
   favoriteClub: string;
 }
+
+export interface ExerciseSet {
+  reps: number;
+  weight: number;
+  completed: boolean;
+}
+
+export interface WorkoutExercise {
+  id: string;
+  name: string;
+  category: string;
+  youtubeId: string;
+  sets: ExerciseSet[];
+}
+
+export interface WorkoutRoutine {
+  id: string;
+  title: string;
+  level: string;
+  duration: number;
+  exercises: WorkoutExercise[];
+}
+
+export interface GymAnnouncement {
+  id: string;
+  title: string;
+  content: string;
+  priority: 'Alta' | 'Normal';
+  date: string;
+}

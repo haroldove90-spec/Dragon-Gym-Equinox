@@ -35,7 +35,7 @@ import {
   Play,
   Volume2
 } from 'lucide-react';
-import { GymClass, UserProfile } from '../types';
+import { GymClass, UserProfile, ExerciseSet, WorkoutExercise, WorkoutRoutine, GymAnnouncement } from '../types';
 
 interface SocioPortalProps {
   classes: GymClass[];
@@ -53,36 +53,6 @@ interface PaymentHistoryItem {
   amount: number;
   method: string;
   status: 'Completado' | 'Pendiente';
-}
-
-interface ExerciseSet {
-  reps: number;
-  weight: number;
-  completed: boolean;
-}
-
-interface WorkoutExercise {
-  id: string;
-  name: string;
-  category: string;
-  youtubeId: string;
-  sets: ExerciseSet[];
-}
-
-interface WorkoutRoutine {
-  id: string;
-  title: string;
-  level: string;
-  duration: number;
-  exercises: WorkoutExercise[];
-}
-
-interface GymAnnouncement {
-  id: string;
-  title: string;
-  content: string;
-  priority: 'Alta' | 'Normal';
-  date: string;
 }
 
 export default function SocioPortal({
@@ -163,112 +133,129 @@ export default function SocioPortal({
   // =========================================================================
   // --- MODULE 2: RAMPED WORKOUT ROUTINES (Rutinas de Entrenamiento) ---
   // =========================================================================
-  const [routines, setRoutines] = useState<WorkoutRoutine[]>([
-    {
-      id: 'routine-1',
-      title: 'Fuerza Dragon Imperial (Push/Pull)',
-      level: 'Avanzado',
-      duration: 55,
-      exercises: [
-        {
-          id: 'ex-1',
-          name: 'Press de Banca Plano con Barra',
-          category: 'Pecho',
-          youtubeId: 'rT7DgCr-3ps',
-          sets: [
-            { reps: 10, weight: 60, completed: false },
-            { reps: 8, weight: 70, completed: false },
-            { reps: 6, weight: 80, completed: false },
-          ]
-        },
-        {
-          id: 'ex-2',
-          name: 'Peso Muerto Convencional',
-          category: 'Espalda/Pierna',
-          youtubeId: 'op9kVnSMy6Q',
-          sets: [
-            { reps: 8, weight: 100, completed: false },
-            { reps: 6, weight: 120, completed: false },
-            { reps: 4, weight: 140, completed: false },
-          ]
-        },
-        {
-          id: 'ex-3',
-          name: 'Remo con Mancuerna a un Brazo',
-          category: 'Espalda',
-          youtubeId: 'roCP6nM_tGo',
-          sets: [
-            { reps: 10, weight: 26, completed: false },
-            { reps: 10, weight: 30, completed: false },
-            { reps: 8, weight: 34, completed: false },
-          ]
-        },
-        {
-          id: 'ex-4',
-          name: 'Press Militar de Hombros con Barra',
-          category: 'Hombros',
-          youtubeId: '2yjwXTZQDDI',
-          sets: [
-            { reps: 10, weight: 40, completed: false },
-            { reps: 8, weight: 45, completed: false },
-            { reps: 6, weight: 50, completed: false },
-          ]
-        },
-      ]
-    },
-    {
-      id: 'routine-2',
-      title: 'Acondicionamiento HIIT Quemador',
-      level: 'Intermedio',
-      duration: 40,
-      exercises: [
-        {
-          id: 'ex-5',
-          name: 'Swings de Kettlebell de Poder',
-          category: 'Glúteos/Cardio',
-          youtubeId: 'mK7C_WbSg_4',
-          sets: [
-            { reps: 15, weight: 16, completed: false },
-            { reps: 15, weight: 20, completed: false },
-            { reps: 15, weight: 24, completed: false },
-          ]
-        },
-        {
-          id: 'ex-6',
-          name: 'Burpees Militares de Alta Intensidad',
-          category: 'Cardio',
-          youtubeId: 'qLBImHhCX8o',
-          sets: [
-            { reps: 12, weight: 0, completed: false },
-            { reps: 12, weight: 0, completed: false },
-            { reps: 12, weight: 0, completed: false },
-          ]
-        },
-        {
-          id: 'ex-7',
-          name: 'Mountain Climbers Explosivos',
-          category: 'Core',
-          youtubeId: 'cnyTQDSE884',
-          sets: [
-            { reps: 30, weight: 0, completed: false },
-            { reps: 30, weight: 0, completed: false },
-            { reps: 30, weight: 0, completed: false },
-          ]
-        },
-        {
-          id: 'ex-8',
-          name: 'Plank Shoulder Taps Firmes',
-          category: 'Abdomen',
-          youtubeId: 'gOhS36mBPlQ',
-          sets: [
-            { reps: 20, weight: 0, completed: false },
-            { reps: 20, weight: 0, completed: false },
-            { reps: 20, weight: 0, completed: false },
-          ]
-        }
-      ]
+  const [routines, setRoutines] = useState<WorkoutRoutine[]>(() => {
+    const saved = localStorage.getItem('eqx_routines');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error reading eqx_routines from localStorage", e);
+      }
     }
-  ]);
+    const defaultRoutines: WorkoutRoutine[] = [
+      {
+        id: 'routine-1',
+        title: 'Fuerza Dragon Imperial (Push/Pull)',
+        level: 'Avanzado',
+        duration: 55,
+        exercises: [
+          {
+            id: 'ex-1',
+            name: 'Press de Banca Plano con Barra',
+            category: 'Pecho',
+            youtubeId: 'rT7DgCr-3ps',
+            sets: [
+              { reps: 10, weight: 60, completed: false },
+              { reps: 8, weight: 70, completed: false },
+              { reps: 6, weight: 80, completed: false },
+            ]
+          },
+          {
+            id: 'ex-2',
+            name: 'Peso Muerto Convencional',
+            category: 'Espalda/Pierna',
+            youtubeId: 'op9kVnSMy6Q',
+            sets: [
+              { reps: 8, weight: 100, completed: false },
+              { reps: 6, weight: 120, completed: false },
+              { reps: 4, weight: 140, completed: false },
+            ]
+          },
+          {
+            id: 'ex-3',
+            name: 'Remo con Mancuerna a un Brazo',
+            category: 'Espalda',
+            youtubeId: 'roCP6nM_tGo',
+            sets: [
+              { reps: 10, weight: 26, completed: false },
+              { reps: 10, weight: 30, completed: false },
+              { reps: 8, weight: 34, completed: false },
+            ]
+          },
+          {
+            id: 'ex-4',
+            name: 'Press Militar de Hombros con Barra',
+            category: 'Hombros',
+            youtubeId: '2yjwXTZQDDI',
+            sets: [
+              { reps: 10, weight: 40, completed: false },
+              { reps: 8, weight: 45, completed: false },
+              { reps: 6, weight: 50, completed: false },
+            ]
+          },
+        ]
+      },
+      {
+        id: 'routine-2',
+        title: 'Acondicionamiento HIIT Quemador',
+        level: 'Intermedio',
+        duration: 40,
+        exercises: [
+          {
+            id: 'ex-5',
+            name: 'Swings de Kettlebell de Poder',
+            category: 'Glúteos/Cardio',
+            youtubeId: 'mK7C_WbSg_4',
+            sets: [
+              { reps: 15, weight: 16, completed: false },
+              { reps: 15, weight: 20, completed: false },
+              { reps: 15, weight: 24, completed: false },
+            ]
+          },
+          {
+            id: 'ex-6',
+            name: 'Burpees Militares de Alta Intensidad',
+            category: 'Cardio',
+            youtubeId: 'qLBImHhCX8o',
+            sets: [
+              { reps: 12, weight: 0, completed: false },
+              { reps: 12, weight: 0, completed: false },
+              { reps: 12, weight: 0, completed: false },
+            ]
+          },
+          {
+            id: 'ex-7',
+            name: 'Mountain Climbers Explosivos',
+            category: 'Core',
+            youtubeId: 'cnyTQDSE884',
+            sets: [
+              { reps: 30, weight: 0, completed: false },
+              { reps: 30, weight: 0, completed: false },
+              { reps: 30, weight: 0, completed: false },
+            ]
+          },
+          {
+            id: 'ex-8',
+            name: 'Plank Shoulder Taps Firmes',
+            category: 'Abdomen',
+            youtubeId: 'gOhS36mBPlQ',
+            sets: [
+              { reps: 20, weight: 0, completed: false },
+              { reps: 20, weight: 0, completed: false },
+              { reps: 20, weight: 0, completed: false },
+            ]
+          }
+        ]
+      }
+    ];
+    localStorage.setItem('eqx_routines', JSON.stringify(defaultRoutines));
+    return defaultRoutines;
+  });
+
+  // Sync routine changes to localStorage to preserve completed workout series
+  useEffect(() => {
+    localStorage.setItem('eqx_routines', JSON.stringify(routines));
+  }, [routines]);
 
   const [selectedRoutineId, setSelectedRoutineId] = useState<string>('routine-1');
   const [activeYoutubeId, setActiveYoutubeId] = useState<string | null>(null);
@@ -446,29 +433,53 @@ Garantía de Acceso Concedida.
   // =========================================================================
   // --- MODULE 5: ANUNCIOS Y COMUNICADOS (Avisos Oficiales del Gym) ---
   // =========================================================================
-  const announcementsList: GymAnnouncement[] = [
-    {
-      id: 'ann-1',
-      title: 'Mantenimiento preventivo en zona de piscinas y vapor',
-      content: 'Estimados atletas: la zona húmeda estará en mantenimiento semestral los días 16 y 17 de Julio. Reabriremos con nuevos sistemas de ozono el sábado 18. Las demás áreas operan en su horario habitual.',
-      priority: 'Alta',
-      date: 'Publicado hoy • 15 Julio 2026'
-    },
-    {
-      id: 'ann-2',
-      title: 'Nueva sesión exclusiva de Box & HIIT con Adrianne G.',
-      content: 'Por alta demanda, sumamos un nuevo horario de "Circuit Breaker Box" los martes y jueves a las 7:00 PM. Reserva tu lugar desde el portal de reservaciones. ¡Cupos limitados!',
-      priority: 'Normal',
-      date: 'Publicado hace 1 día • 14 Julio 2026'
-    },
-    {
-      id: 'ann-3',
-      title: 'Semana de descuento nutricional en Dragon Shop',
-      content: 'Aprovecha un 15% de descuento directo en todas las proteínas aisladas de suero e hidratantes isotónicos oficiales en la recepción del club presentando tu pase digital QR activo.',
-      priority: 'Normal',
-      date: 'Publicado hace 3 días • 12 Julio 2026'
+  const [announcementsList, setAnnouncementsList] = useState<GymAnnouncement[]>(() => {
+    const saved = localStorage.getItem('eqx_announcements');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error reading eqx_announcements from localStorage", e);
+      }
     }
-  ];
+    const defaultAnnouncements: GymAnnouncement[] = [
+      {
+        id: 'ann-1',
+        title: 'Mantenimiento preventivo en zona de piscinas y vapor',
+        content: 'Estimados atletas: la zona húmeda estará en mantenimiento semestral los días 16 y 17 de Julio. Reabriremos con nuevos sistemas de ozono el sábado 18. Las demás áreas operan en su horario habitual.',
+        priority: 'Alta',
+        date: 'Publicado hoy • 15 Julio 2026'
+      },
+      {
+        id: 'ann-2',
+        title: 'Nueva sesión exclusiva de Box & HIIT con Adrianne G.',
+        content: 'Por alta demanda, sumamos un nuevo horario de "Circuit Breaker Box" los martes y jueves a las 7:00 PM. Reserva tu lugar desde el portal de reservaciones. ¡Cupos limitados!',
+        priority: 'Normal',
+        date: 'Publicado hace 1 día • 14 Julio 2026'
+      },
+      {
+        id: 'ann-3',
+        title: 'Semana de descuento nutricional en Dragon Shop',
+        content: 'Aprovecha un 15% de descuento directo en todas las proteínas aisladas de suero e hidratantes isotónicos oficiales en la recepción del club presentando tu pase digital QR activo.',
+        priority: 'Normal',
+        date: 'Publicado hace 3 días • 12 Julio 2026'
+      }
+    ];
+    localStorage.setItem('eqx_announcements', JSON.stringify(defaultAnnouncements));
+    return defaultAnnouncements;
+  });
+
+  // Sync to localStorage on change and keep an effect to poll or update when tab is accessed
+  useEffect(() => {
+    const saved = localStorage.getItem('eqx_announcements');
+    if (saved) {
+      try {
+        setAnnouncementsList(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [activeTab]);
 
   // =========================================================================
   // --- MODULE 6: PERFIL DEL ATLETA ---
