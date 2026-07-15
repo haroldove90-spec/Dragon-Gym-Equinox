@@ -145,8 +145,28 @@ export default function AdminPortal({
   return (
     <div className="fixed inset-0 bg-black/95 z-50 overflow-hidden flex flex-col md:flex-row">
       
+      {/* Mobile Top Header Bar */}
+      <header className="flex md:hidden justify-between items-center px-4 py-3.5 border-b border-neutral-900 bg-neutral-950 shrink-0 z-40">
+        <div className="flex items-center gap-2">
+          <div className="p-1 bg-brand-gold/10 border border-brand-gold/20 rounded-lg">
+            <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
+          </div>
+          <div>
+            <h1 className="text-xs font-display font-bold text-white tracking-wider">DRAGON CLUB</h1>
+            <p className="text-[7px] font-mono text-neutral-500 uppercase">Administración</p>
+          </div>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="p-1.5 bg-neutral-900 hover:bg-neutral-850 text-neutral-400 hover:text-white rounded-lg border border-neutral-850 transition"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </header>
+
       {/* 1. Sophisticated Navigation Sidebar on Desktop */}
-      <div className="w-full md:w-64 bg-neutral-950 border-b md:border-b-0 md:border-r border-neutral-900 flex flex-col justify-between shrink-0">
+      <div className="hidden md:flex md:w-64 bg-neutral-950 md:border-r border-neutral-900 flex-col justify-between shrink-0">
         <div className="p-5 space-y-6">
           {/* Header Brand */}
           <div className="flex items-center justify-between">
@@ -273,6 +293,28 @@ export default function AdminPortal({
             </motion.div>
           </AnimatePresence>
         </main>
+      </div>
+
+      {/* PERSISTENT MOBILE BOTTOM NAVIGATION BAR FOR ADMIN */}
+      {/* Ensures target touch layout is at least 44px (using py-2.5, h-[68px], large hit zones) */}
+      <div className="fixed bottom-0 inset-x-0 bg-neutral-950/95 backdrop-blur-md border-t border-neutral-900 px-4 py-2.5 z-40 flex items-center gap-6 overflow-x-auto scrollbar-none md:hidden h-[68px]">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center justify-center gap-1.5 transition shrink-0 px-2 h-12 ${
+                isActive ? 'text-brand-gold font-bold' : 'text-neutral-500 hover:text-neutral-400'
+              }`}
+              style={{ minHeight: '44px' }}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[9px] font-semibold uppercase tracking-wider whitespace-nowrap">{item.name}</span>
+            </button>
+          );
+        })}
       </div>
 
     </div>
