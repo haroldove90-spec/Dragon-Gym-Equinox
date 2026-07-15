@@ -61,7 +61,12 @@ export interface Article {
 }
 
 export interface UserProfile {
+  id: string;
   name: string;
+  email: string;
+  phone: string;
+  bloodType: string;
+  emergencyContact: string;
   avatarLetter: string;
   checkInCount: number;
   checkInGoal: number;

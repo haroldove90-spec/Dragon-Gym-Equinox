@@ -1,7 +1,12 @@
 import { GymClass, Program, Article, UserProfile } from './types';
 
 export const mockUserProfile: UserProfile = {
-  name: "Molly",
+  id: "DG-ATHLETE-7102",
+  name: "Molly Jones",
+  email: "molly.jones@dragongym.com",
+  phone: "+1 (555) 381-9921",
+  bloodType: "O+",
+  emergencyContact: "David Jones (Husband) - +1 (555) 381-0022",
   avatarLetter: "M",
   checkInCount: 2,
   checkInGoal: 3,
