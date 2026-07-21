@@ -591,6 +591,9 @@ export default function App() {
               });
             }}
             onTriggerNotification={(msg) => triggerNotification(msg)}
+            onUpdateUser={(updatedUser) => {
+              setUser(updatedUser);
+            }}
           />
         )}
       </AnimatePresence>

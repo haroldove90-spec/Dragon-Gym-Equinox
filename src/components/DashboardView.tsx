@@ -84,11 +84,11 @@ export default function DashboardView({
             />
             <div className="absolute inset-0 bg-neutral-950/25 group-hover:bg-neutral-950/15 transition" />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-              <span className="text-sm md:text-base font-display font-black tracking-[0.3em] text-white uppercase group-hover:text-brand-gold transition duration-300">
-                PORTAL ADMINISTRADOR
+              <span className="text-sm md:text-base font-display font-black tracking-[0.2em] text-white uppercase group-hover:text-brand-gold transition duration-300">
+                PORTAL ADMINISTRADOR / DUEÑO
               </span>
               <span className="text-[9px] font-mono tracking-wider text-neutral-400 mt-1 uppercase opacity-80 group-hover:opacity-100 transition">
-                Métricas y Gestión de Horarios
+                Gerencia & IA • Dashboard Financiero, Analítica & Agente IA
               </span>
             </div>
           </div>

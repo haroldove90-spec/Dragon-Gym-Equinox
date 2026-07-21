@@ -24,7 +24,11 @@ import {
   Trash2,
   Ban,
   TrendingUp,
-  FileText
+  FileText,
+  ShoppingBag,
+  Plus,
+  Minus,
+  PackageOpen
 } from 'lucide-react';
 import { GymClass, UserProfile } from '../types';
 
@@ -34,6 +38,7 @@ interface StaffPortalProps {
   onClose: () => void;
   onIncrementCheckIn: () => void;
   onTriggerNotification: (message: string) => void;
+  onUpdateUser?: (updatedUser: UserProfile) => void;
 }
 
 interface ClientProfile {
@@ -79,7 +84,8 @@ export default function StaffPortal({
   user,
   onClose,
   onIncrementCheckIn,
-  onTriggerNotification
+  onTriggerNotification,
+  onUpdateUser
 }: StaffPortalProps) {
   
   // Navigation tabs (Monitor, Inscripción, POS / Caja, Pases Temporales, Lista Asistencia)
@@ -88,14 +94,46 @@ export default function StaffPortal({
   // =========================================================================
   // --- STATE FOR CLIENTS & MEMBERS ---
   // =========================================================================
-  const [clients, setClients] = useState<ClientProfile[]>([
-    { id: 'DG-1090', name: 'Sarah Connor', email: 'sarah.c@sky.net', phone: '+1 (555) 109-0221', bloodType: 'A-', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 11:15 AM', avatarColor: 'bg-emerald-500/20 text-emerald-300' },
-    { id: 'DG-2281', name: 'John Connor', email: 'john.c@sky.net', phone: '+1 (555) 228-1110', bloodType: 'O+', membershipLevel: 'Plan Mensual Estándar', status: 'Vencido', lastCheckIn: 'Hace 5 días', avatarColor: 'bg-red-500/20 text-red-300' },
-    { id: 'DG-3382', name: 'Marcus Wright', email: 'marcus@projectangel.org', phone: '+1 (555) 338-2026', bloodType: 'B+', membershipLevel: 'Plan Anual Elite', status: 'Activo', lastCheckIn: 'Hoy, 10:55 AM', avatarColor: 'bg-blue-500/20 text-blue-300' },
-    { id: 'DG-4512', name: 'Kyle Reese', email: 'kyle.reese@resistance.org', phone: '+1 (555) 451-2291', bloodType: 'O-', membershipLevel: 'Plan Mensual Estándar', status: 'Pendiente', lastCheckIn: 'Hace 12 días', avatarColor: 'bg-amber-500/20 text-amber-300' },
-    { id: 'DG-5555', name: 'T-800 Cyberdyne', email: 'terminator@skynet.com', phone: '+1 (555) 800-1984', bloodType: 'Metálico', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 09:12 AM', avatarColor: 'bg-purple-500/20 text-purple-300' },
-    { id: user.id || 'DG-ATHLETE-7102', name: user.name, email: user.email, phone: user.phone || '+1 (555) 381-9921', bloodType: user.bloodType || 'O+', membershipLevel: user.membershipLevel, status: user.membershipLevel.toLowerCase().includes('vencid') ? 'Vencido' : 'Activo', lastCheckIn: 'Hoy, 08:30 AM', avatarColor: 'bg-brand-gold/20 text-brand-gold' }
-  ]);
+  const [clients, setClients] = useState<ClientProfile[]>(() => {
+    const saved = localStorage.getItem('eqx_gym_clients');
+    const userAsClient = {
+      id: user.id || 'DG-ATHLETE-7102',
+      name: user.name,
+      email: user.email,
+      phone: user.phone || '+1 (555) 381-9921',
+      bloodType: user.bloodType || 'O+',
+      membershipLevel: user.membershipLevel,
+      status: (user.membershipLevel.toLowerCase().includes('vencid') || user.membershipLevel.toLowerCase().includes('inactiv')) ? 'Vencido' : 'Activo' as 'Activo' | 'Vencido' | 'Pendiente',
+      lastCheckIn: 'Hoy, 08:30 AM',
+      avatarColor: 'bg-brand-gold/20 text-brand-gold'
+    };
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const hasUser = parsed.some((c: any) => c.id === user.id);
+        if (hasUser) {
+          return parsed.map((c: any) => c.id === user.id ? { ...c, ...userAsClient } : c);
+        } else {
+          return [...parsed, userAsClient];
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return [
+      { id: 'DG-1090', name: 'Sarah Connor', email: 'sarah.c@sky.net', phone: '+1 (555) 109-0221', bloodType: 'A-', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 11:15 AM', avatarColor: 'bg-emerald-500/20 text-emerald-300' },
+      { id: 'DG-2281', name: 'John Connor', email: 'john.c@sky.net', phone: '+1 (555) 228-1110', bloodType: 'O+', membershipLevel: 'Plan Mensual Estándar', status: 'Vencido', lastCheckIn: 'Hace 5 días', avatarColor: 'bg-red-500/20 text-red-300' },
+      { id: 'DG-3382', name: 'Marcus Wright', email: 'marcus@projectangel.org', phone: '+1 (555) 338-2026', bloodType: 'B+', membershipLevel: 'Plan Anual Elite', status: 'Activo', lastCheckIn: 'Hoy, 10:55 AM', avatarColor: 'bg-blue-500/20 text-blue-300' },
+      { id: 'DG-4512', name: 'Kyle Reese', email: 'kyle.reese@resistance.org', phone: '+1 (555) 451-2291', bloodType: 'O-', membershipLevel: 'Plan Mensual Estándar', status: 'Pendiente', lastCheckIn: 'Hace 12 días', avatarColor: 'bg-amber-500/20 text-amber-300' },
+      { id: 'DG-5555', name: 'T-800 Cyberdyne', email: 'terminator@skynet.com', phone: '+1 (555) 800-1984', bloodType: 'Metálico', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 09:12 AM', avatarColor: 'bg-purple-500/20 text-purple-300' },
+      userAsClient
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('eqx_gym_clients', JSON.stringify(clients));
+  }, [clients]);
 
   // Synchronize active user state edits if needed
   useEffect(() => {
@@ -108,7 +146,7 @@ export default function StaffPortal({
           phone: user.phone,
           bloodType: user.bloodType,
           membershipLevel: user.membershipLevel,
-          status: user.membershipLevel.toLowerCase().includes('vencid') ? 'Vencido' : 'Activo'
+          status: (user.membershipLevel.toLowerCase().includes('vencid') || user.membershipLevel.toLowerCase().includes('inactiv')) ? 'Vencido' : 'Activo'
         };
       }
       return c;
@@ -235,6 +273,142 @@ export default function StaffPortal({
     { id: 'TX-POS-102', name: 'Marcus Wright', amount: 59, method: 'Efectivo', date: '10:55 AM' }
   ]);
 
+  // --- ADICIONES PARA INTEGRAR EN ROLES STAFF ---
+  // Sub-pestaña para POS/Caja (Membresías o Tienda Física/Pedidos)
+  const [posSubTab, setPosSubTab] = useState<'membresias' | 'tienda'>('membresias');
+  
+  // Carrito de compras para Tienda Física
+  const [posCart, setPosCart] = useState<Array<{ product: { id: string; name: string; price: number; category: string }; quantity: number }>>([]);
+  const [cartSocioId, setCartSocioId] = useState<string>('publico'); // 'publico' o el ID de un socio
+  const [cartPaymentMethod, setCartPaymentMethod] = useState<'Efectivo' | 'Terminal'>('Terminal');
+
+  // Búsqueda para entrada manual/asistida
+  const [manualCheckInQuery, setManualCheckInQuery] = useState('');
+  const [showManualSuggestions, setShowManualSuggestions] = useState(false);
+
+  // Pedidos realizados por los socios desde la app
+  const [pendingOrders, setPendingOrders] = useState<Array<{ id: string; clientName: string; clientId: string; productName: string; price: number; date: string; status: string }>>([]);
+
+  const shopProductsList = [
+    { id: 'p1', name: 'Suplemento Proteína de Suero Aislada (1kg)', price: 39, category: 'Suplementos' },
+    { id: 'p2', name: 'Bebida de Electrólitos Hidratantes Oficial', price: 3, category: 'Bebidas' },
+    { id: 'p3', name: 'Barra Energética Pro-Nutritiva Dragon', price: 4, category: 'Snacks' },
+    { id: 'p4', name: 'Shaker Mezclador Oficial Dragon Gym', price: 8, category: 'Accesorios' },
+    { id: 'p5', name: 'Toalla de Microfibra Ultra-Absorbente', price: 10, category: 'Accesorios' },
+    { id: 'p6', name: 'Scoop Individual de Pre-Entreno Dragon Punch', price: 3, category: 'Bebidas' }
+  ];
+
+  // Carga de pedidos desde localStorage
+  useEffect(() => {
+    const loadOrders = () => {
+      const saved = localStorage.getItem('eqx_pending_orders');
+      if (saved) {
+        try {
+          setPendingOrders(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // Mock inicial de pedidos para que la interfaz nunca se vea vacía
+        const initialMockOrders = [
+          { id: 'ORD-541', clientName: 'Sarah Connor', clientId: 'DG-1090', productName: 'Bebida de Electrólitos Hidratantes Oficial', price: 3, date: '11:12 AM', status: 'Pendiente' },
+          { id: 'ORD-210', clientName: 'Marcus Wright', clientId: 'DG-3382', productName: 'Suplemento Proteína de Suero Aislada (1kg)', price: 39, date: '10:50 AM', status: 'Entregado' }
+        ];
+        localStorage.setItem('eqx_pending_orders', JSON.stringify(initialMockOrders));
+        setPendingOrders(initialMockOrders);
+      }
+    };
+    loadOrders();
+    // Escuchar cambios de localStorage para actualizar en tiempo real
+    window.addEventListener('storage', loadOrders);
+    return () => window.removeEventListener('storage', loadOrders);
+  }, [activeTab]);
+
+  const handleManualCheckIn = (clientId: string) => {
+    const foundClient = clients.find(c => c.id === clientId);
+    if (!foundClient) {
+      onTriggerNotification("❌ ID de Atleta no registrado en el sistema.");
+      return;
+    }
+
+    setIsScanning(true);
+    setHighlightedScan(null);
+
+    setTimeout(() => {
+      setIsScanning(false);
+      const isConcedido = foundClient.status === 'Activo';
+      const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const newLog: ScanLog = {
+        id: String(Date.now()),
+        name: foundClient.name,
+        email: foundClient.email,
+        time: timeString,
+        status: isConcedido ? 'Concedido' : 'Denegado',
+        reason: isConcedido ? undefined : foundClient.status === 'Vencido' ? 'Membresía Vencida' : 'Pago Pendiente / Requiere Registro',
+        avatarLetter: foundClient.name.charAt(0).toUpperCase(),
+        avatarColor: foundClient.avatarColor
+      };
+
+      setScanLogs(prev => [newLog, ...prev]);
+      setHighlightedScan(newLog);
+      setSelectedScanProfile(foundClient);
+      setManualCheckInQuery('');
+      setShowManualSuggestions(false);
+
+      if (isConcedido) {
+        onTriggerNotification(`🟢 Acceso Concedido: ${foundClient.name} (Validación Asistida)`);
+        if (foundClient.id === user.id) {
+          onIncrementCheckIn();
+        }
+      } else {
+        onTriggerNotification(`🔴 Acceso Denegado: ${foundClient.name} (${newLog.reason})`);
+      }
+    }, 1000);
+  };
+
+  const handleProcessShopSale = () => {
+    if (posCart.length === 0) {
+      onTriggerNotification("⚠️ El carrito de compras está vacío.");
+      return;
+    }
+
+    const total = posCart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    
+    // Find client name
+    const buyerName = cartSocioId === 'publico' 
+      ? 'Cliente General' 
+      : (clients.find(c => c.id === cartSocioId)?.name || 'Atleta Dragon');
+
+    if (cartPaymentMethod === 'Efectivo') {
+      setShiftSalesCash(prev => prev + total);
+    } else {
+      setShiftSalesTerminal(prev => prev + total);
+    }
+
+    const txId = `TX-SHOP-${Math.floor(200 + Math.random() * 800)}`;
+    setSalesHistory(prev => [
+      { id: txId, name: `${buyerName} (Tienda)`, amount: total, method: cartPaymentMethod, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+      ...prev
+    ]);
+
+    onTriggerNotification(`✔ Venta cobrada: $${total} USD. Transacción ${txId} registrada.`);
+    setPosCart([]);
+    setCartSocioId('publico');
+  };
+
+  const handleDeliverAppOrder = (orderId: string) => {
+    const updatedOrders = pendingOrders.map(ord => {
+      if (ord.id === orderId) {
+        onTriggerNotification(`✔ Pedido ${ord.id} entregado con éxito a ${ord.clientName}.`);
+        return { ...ord, status: 'Entregado' as const };
+      }
+      return ord;
+    });
+    setPendingOrders(updatedOrders);
+    localStorage.setItem('eqx_pending_orders', JSON.stringify(updatedOrders));
+  };
+
   const filteredClients = clients.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -246,17 +420,25 @@ export default function StaffPortal({
 
     const prices = { Mensual: 59, Anual: 499, VIP: 120 };
     const amount = prices[selectedMembershipToBuy];
+    const newLevel = `${selectedMembershipToBuy === 'VIP' ? 'VIP Dragon Pass' : selectedMembershipToBuy === 'Anual' ? 'Plan Anual Elite' : 'Plan Mensual Estándar'}`;
 
     setClients(prev => prev.map(c => {
       if (c.id === selectedClient.id) {
         return {
           ...c,
           status: 'Activo',
-          membershipLevel: `${selectedMembershipToBuy === 'VIP' ? 'VIP Dragon Pass' : selectedMembershipToBuy === 'Anual' ? 'Plan Anual Elite' : 'Plan Mensual Estándar'}`
+          membershipLevel: newLevel
         };
       }
       return c;
     }));
+
+    if (selectedClient.id === user.id && onUpdateUser) {
+      onUpdateUser({
+        ...user,
+        membershipLevel: newLevel
+      });
+    }
 
     if (paymentMethod === 'Efectivo') {
       setShiftSalesCash(prev => prev + amount);
@@ -495,6 +677,91 @@ export default function StaffPortal({
                 </button>
               </div>
 
+              {/* Validación Manual / Asistida de Acceso */}
+              <div className="bg-neutral-900/30 border border-neutral-900 rounded-2xl p-5 space-y-4 text-left">
+                <div className="flex items-center gap-2 pb-2 border-b border-neutral-900">
+                  <UserCheck className="w-4 h-4 text-brand-gold" />
+                  <span className="text-xs font-mono text-white uppercase tracking-wider font-bold">Acceso Manual / Asistido</span>
+                </div>
+                
+                <div className="space-y-2 relative">
+                  <label className="text-[10px] font-mono text-neutral-400 uppercase">Buscar Atleta por ID o Nombre</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Ej. Molly, DG-1090..."
+                      value={manualCheckInQuery}
+                      onChange={(e) => {
+                        setManualCheckInQuery(e.target.value);
+                        setShowManualSuggestions(true);
+                      }}
+                      onFocus={() => setShowManualSuggestions(true)}
+                      className="flex-1 bg-black border border-neutral-850 rounded-xl px-3 py-2 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-brand-gold/50"
+                    />
+                    {manualCheckInQuery && (
+                      <button
+                        onClick={() => {
+                          setManualCheckInQuery('');
+                          setShowManualSuggestions(false);
+                        }}
+                        className="text-[10px] font-mono text-neutral-500 hover:text-white px-1"
+                      >
+                        Limpiar
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Suggestions Dropdown */}
+                  {showManualSuggestions && manualCheckInQuery && (
+                    <div className="absolute z-20 left-0 right-0 mt-1 bg-neutral-950 border border-neutral-850 rounded-xl max-h-40 overflow-y-auto shadow-2xl divide-y divide-neutral-900">
+                      {clients
+                        .filter(c => 
+                          c.name.toLowerCase().includes(manualCheckInQuery.toLowerCase()) ||
+                          c.id.toLowerCase().includes(manualCheckInQuery.toLowerCase())
+                        )
+                        .map(client => (
+                          <button
+                            key={client.id}
+                            type="button"
+                            onClick={() => {
+                              setManualCheckInQuery(client.id);
+                              setShowManualSuggestions(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs hover:bg-neutral-900 flex justify-between items-center transition"
+                          >
+                            <div>
+                              <p className="font-semibold text-white">{client.name}</p>
+                              <p className="text-[9px] font-mono text-neutral-500">{client.id}</p>
+                            </div>
+                            <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full ${
+                              client.status === 'Activo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                            }`}>
+                              {client.status}
+                            </span>
+                          </button>
+                        ))}
+                      {clients.filter(c => 
+                        c.name.toLowerCase().includes(manualCheckInQuery.toLowerCase()) ||
+                        c.id.toLowerCase().includes(manualCheckInQuery.toLowerCase())
+                      ).length === 0 && (
+                        <div className="p-3 text-center text-neutral-600 text-xs font-mono">
+                          Sin resultados
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleManualCheckIn(manualCheckInQuery)}
+                  disabled={!manualCheckInQuery || isScanning}
+                  className="w-full bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold border border-brand-gold/30 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition disabled:opacity-40"
+                >
+                  Validar Entrada (Asistida)
+                </button>
+              </div>
+
               {/* Instant Alert State Card */}
               {highlightedScan && (
                 <motion.div
@@ -725,199 +992,508 @@ export default function StaffPortal({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-6 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 text-left"
+            className="space-y-6 max-w-5xl mx-auto text-left"
           >
-            {/* Left side: Intelligent predictive search box & client matches */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-5 space-y-3.5">
-                <div className="space-y-1">
-                  <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">Buscador Inteligente de Socios</h3>
-                  <p className="text-[10px] text-neutral-500">Busca en tiempo real por Nombre, Correo o ID único.</p>
-                </div>
-
-                <div className="relative">
-                  <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-neutral-500" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Escribe el ID (ej: DG-1090), nombre o correo..."
-                    className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-emerald-400 transition"
-                  />
-                </div>
-              </div>
-
-              {/* Matches list */}
-              <div className="bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden">
-                <div className="p-4 border-b border-neutral-900 flex justify-between items-center bg-black/30">
-                  <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Resultados de Búsqueda ({filteredClients.length})</span>
-                </div>
-
-                <div className="divide-y divide-neutral-900 max-h-[300px] overflow-y-auto no-scrollbar">
-                  {filteredClients.map((c) => {
-                    const isSelected = selectedClient?.id === c.id;
-                    return (
-                      <div
-                        key={c.id}
-                        onClick={() => setSelectedClient(c)}
-                        className={`p-3.5 flex items-center justify-between gap-4 cursor-pointer transition ${
-                          isSelected ? 'bg-emerald-500/5 border-l-2 border-emerald-400' : 'hover:bg-neutral-900/10'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-display ${c.avatarColor}`}>
-                            {c.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-xs font-semibold text-white">{c.name}</h4>
-                              <span className="text-[9px] font-mono text-neutral-500">{c.id}</span>
-                            </div>
-                            <p className="text-[10px] text-neutral-400 mt-0.5">{c.email} • {c.membershipLevel}</p>
-                          </div>
-                        </div>
-
-                        <div>
-                          {c.status === 'Activo' ? (
-                            <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
-                              Activo
-                            </span>
-                          ) : c.status === 'Vencido' ? (
-                            <span className="text-[9px] font-mono text-red-400 bg-red-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
-                              Vencido
-                            </span>
-                          ) : (
-                            <span className="text-[9px] font-mono text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
-                              Pendiente
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {filteredClients.length === 0 && (
-                    <div className="p-8 text-center space-y-2 text-neutral-500">
-                      <Inbox className="w-8 h-8 mx-auto text-neutral-700" />
-                      <p className="text-xs">Sin coincidencias para la búsqueda.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+            {/* SUB-TABS SELECTOR FOR POS PANEL */}
+            <div className="flex border-b border-neutral-900 pb-px gap-2">
+              <button
+                type="button"
+                onClick={() => setPosSubTab('membresias')}
+                className={`px-5 py-3 text-xs font-mono font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2 ${
+                  posSubTab === 'membresias'
+                    ? 'border-brand-gold text-brand-gold bg-brand-gold/5'
+                    : 'border-transparent text-neutral-400 hover:text-white'
+                }`}
+              >
+                <CreditCard className="w-4 h-4" />
+                Membresías & Cobros
+              </button>
+              <button
+                type="button"
+                onClick={() => setPosSubTab('tienda')}
+                className={`px-5 py-3 text-xs font-mono font-bold uppercase tracking-wider border-b-2 transition flex items-center gap-2 ${
+                  posSubTab === 'tienda'
+                    ? 'border-brand-gold text-brand-gold bg-brand-gold/5'
+                    : 'border-transparent text-neutral-400 hover:text-white'
+                }`}
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Tienda Física & Pedidos App
+                {pendingOrders.filter(o => o.status === 'Pendiente').length > 0 && (
+                  <span className="bg-brand-gold text-black text-[9px] font-bold font-mono px-1.5 py-0.5 rounded-full animate-pulse">
+                    {pendingOrders.filter(o => o.status === 'Pendiente').length}
+                  </span>
+                )}
+              </button>
             </div>
 
-            {/* Right side: Register payment + Cut of cash drawer widget */}
-            <div className="lg:col-span-5 space-y-5">
-              
-              {/* Cobro / Checkout form */}
-              <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold block pb-2 border-b border-neutral-900">
-                  Registro de Cobro en Mostrador
-                </span>
-
-                {selectedClient ? (
-                  <div className="space-y-4">
-                    <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl">
-                      <p className="text-[8px] font-mono text-neutral-500 uppercase tracking-widest">Socio Destino</p>
-                      <h4 className="text-xs font-bold text-white mt-1">{selectedClient.name}</h4>
-                      <p className="text-[10px] text-neutral-400 mt-0.5">ID: {selectedClient.id} • {selectedClient.phone}</p>
+            {posSubTab === 'membresias' ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+                {/* Left side: Intelligent predictive search box & client matches */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-5 space-y-3.5">
+                    <div className="space-y-1">
+                      <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">Buscador Inteligente de Socios</h3>
+                      <p className="text-[10px] text-neutral-500 font-mono">Busca en tiempo real por Nombre, Correo o ID único.</p>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Seleccionar Renovación / Producto</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {['Mensual', 'Anual', 'VIP'].map((p) => (
-                          <button
-                            key={p}
-                            type="button"
-                            onClick={() => setSelectedMembershipToBuy(p as any)}
-                            className={`py-2 rounded-xl text-center text-xs font-bold border transition uppercase ${
-                              selectedMembershipToBuy === p 
-                                ? 'bg-emerald-400 text-black border-emerald-400' 
-                                : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                    <div className="relative">
+                      <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-neutral-500" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Escribe el ID (ej: Molly, DG-1090), nombre o correo..."
+                        className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-brand-gold/50 transition"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Matches list */}
+                  <div className="bg-neutral-950 border border-neutral-900 rounded-2xl overflow-hidden">
+                    <div className="p-4 border-b border-neutral-900 flex justify-between items-center bg-black/30">
+                      <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Resultados de Búsqueda ({filteredClients.length})</span>
+                    </div>
+
+                    <div className="divide-y divide-neutral-900 max-h-[300px] overflow-y-auto no-scrollbar">
+                      {filteredClients.map((c) => {
+                        const isSelected = selectedClient?.id === c.id;
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => setSelectedClient(c)}
+                            className={`p-3.5 flex items-center justify-between gap-4 cursor-pointer transition ${
+                              isSelected ? 'bg-emerald-500/5 border-l-2 border-emerald-400' : 'hover:bg-neutral-900/10'
                             }`}
                           >
-                            {p}
-                          </button>
-                        ))}
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-display ${c.avatarColor}`}>
+                                {c.name.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-xs font-semibold text-white">{c.name}</h4>
+                                  <span className="text-[9px] font-mono text-neutral-500">{c.id}</span>
+                                </div>
+                                <p className="text-[10px] text-neutral-400 mt-0.5">{c.email} • {c.membershipLevel}</p>
+                              </div>
+                            </div>
+
+                            <div>
+                              {c.status === 'Activo' ? (
+                                <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
+                                  Activo
+                                </span>
+                              ) : c.status === 'Vencido' ? (
+                                <span className="text-[9px] font-mono text-red-400 bg-red-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
+                                  Vencido
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-mono text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full uppercase font-bold">
+                                  Pendiente
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {filteredClients.length === 0 && (
+                        <div className="p-8 text-center space-y-2 text-neutral-500">
+                          <Inbox className="w-8 h-8 mx-auto text-neutral-700" />
+                          <p className="text-xs">Sin coincidencias para la búsqueda.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right side: Register payment + Cut of cash drawer widget */}
+                <div className="lg:col-span-5 space-y-5">
+                  {/* Cobro / Checkout form */}
+                  <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold block pb-2 border-b border-neutral-900">
+                      Registro de Cobro en Mostrador
+                    </span>
+
+                    {selectedClient ? (
+                      <div className="space-y-4">
+                        <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl">
+                          <p className="text-[8px] font-mono text-neutral-500 uppercase tracking-widest">Socio Destino</p>
+                          <h4 className="text-xs font-bold text-white mt-1">{selectedClient.name}</h4>
+                          <p className="text-[10px] text-neutral-400 mt-0.5">ID: {selectedClient.id} • {selectedClient.phone}</p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Seleccionar Renovación / Producto</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            {['Mensual', 'Anual', 'VIP'].map((p) => (
+                              <button
+                                key={p}
+                                type="button"
+                                onClick={() => setSelectedMembershipToBuy(p as any)}
+                                className={`py-2 rounded-xl text-center text-xs font-bold border transition uppercase ${
+                                  selectedMembershipToBuy === p 
+                                    ? 'bg-emerald-400 text-black border-emerald-400' 
+                                    : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                                }`}
+                              >
+                                {p}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Método de Pago Recibido</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod('Efectivo')}
+                              className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
+                                paymentMethod === 'Efectivo' 
+                                  ? 'bg-white text-black border-white' 
+                                  : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                              }`}
+                            >
+                              Efectivo
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod('Terminal')}
+                              className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
+                                paymentMethod === 'Terminal' 
+                                  ? 'bg-white text-black border-white' 
+                                  : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                              }`}
+                            >
+                              Terminal Bancaria
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleProcessPayment}
+                          className="w-full bg-emerald-400 hover:bg-emerald-350 text-black py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-lg"
+                        >
+                          Registrar Cobro Manual
+                        </button>
                       </div>
+                    ) : (
+                      <div className="p-8 text-center text-neutral-500 text-xs font-mono">
+                        Busca y selecciona un socio para habilitar la caja rápida.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CORTE DE CAJA PARCIAL */}
+                  <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
+                      <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Corte de Caja Diario</span>
+                      <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase animate-pulse">Cajero Operativo</span>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Método de Pago Recibido</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('Efectivo')}
-                          className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
-                            paymentMethod === 'Efectivo' 
-                              ? 'bg-white text-black border-white' 
-                              : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
-                          }`}
-                        >
-                          Efectivo
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('Terminal')}
-                          className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
-                            paymentMethod === 'Terminal' 
-                              ? 'bg-white text-black border-white' 
-                              : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
-                          }`}
-                        >
-                          Terminal Bancaria
-                        </button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
+                        <p className="text-[9px] font-mono text-neutral-500 uppercase">Efectivo Turno</p>
+                        <p className="text-base font-mono font-bold text-white">${shiftSalesCash} USD</p>
+                      </div>
+                      <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
+                        <p className="text-[9px] font-mono text-neutral-500 uppercase">Terminal Turno</p>
+                        <p className="text-base font-mono font-bold text-white">${shiftSalesTerminal} USD</p>
                       </div>
                     </div>
 
                     <button
-                      onClick={handleProcessPayment}
-                      className="w-full bg-emerald-400 hover:bg-emerald-350 text-black py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-lg"
+                      type="button"
+                      onClick={() => {
+                        const total = shiftSalesCash + shiftSalesTerminal;
+                        onTriggerNotification(`Corte de caja registrado para el turno. Total declarado de $${total} USD.`);
+                        setShiftSalesCash(0);
+                        setShiftSalesTerminal(0);
+                        setSalesHistory([]);
+                      }}
+                      className="w-full bg-neutral-950 hover:bg-neutral-900 text-neutral-300 border border-neutral-850 py-2.5 rounded-xl font-semibold text-xs transition uppercase tracking-wide"
                     >
-                      Registrar Cobro Manual
+                      Realizar Corte y Cierre de Turno
                     </button>
                   </div>
-                ) : (
-                  <div className="p-8 text-center text-neutral-500 text-xs font-mono">
-                    Busca y selecciona un socio para habilitar la caja rápida.
-                  </div>
-                )}
+                </div>
               </div>
+            ) : (
+              // SUB-TAB: TIENDA FISICA & PEDIDOS APP
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+                {/* Left Side: Delivery Pending Queue & Product Catalog */}
+                <div className="lg:col-span-7 space-y-6">
+                  
+                  {/* APP PENDING ORDERS MODULE */}
+                  <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
+                      <div>
+                        <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold flex items-center gap-2">
+                          <PackageOpen className="w-4 h-4 text-brand-gold animate-pulse" />
+                          Despacho de Pedidos (App Móvil)
+                        </h3>
+                        <p className="text-[10px] text-neutral-500 font-mono mt-0.5">Pedidos realizados por socios para entrega rápida en recepción.</p>
+                      </div>
+                    </div>
 
-              {/* CORTE DE CAJA PARCIAL */}
-              <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
-                <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
-                  <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Corte de Caja Diario</span>
-                  <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase animate-pulse">Cajero Operativo</span>
+                    <div className="space-y-2.5 max-h-[220px] overflow-y-auto no-scrollbar">
+                      {pendingOrders.map((order) => (
+                        <div
+                          key={order.id}
+                          className={`bg-neutral-950 border rounded-xl p-3.5 flex items-center justify-between gap-4 transition text-left ${
+                            order.status === 'Pendiente' ? 'border-brand-gold/30 hover:border-brand-gold/50' : 'border-neutral-900 opacity-60'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-white">{order.clientName}</span>
+                              <span className="text-[8px] font-mono text-neutral-500 bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-850">
+                                {order.id}
+                              </span>
+                            </div>
+                            <p className="text-xs text-neutral-300 font-medium">{order.productName}</p>
+                            <div className="flex items-center gap-2 text-[9px] font-mono text-neutral-500">
+                              <span>Socio: {order.clientId}</span>
+                              <span>•</span>
+                              <span>Hora: {order.date}</span>
+                              <span>•</span>
+                              <span className="text-brand-gold font-bold">${order.price} USD</span>
+                            </div>
+                          </div>
+
+                          <div>
+                            {order.status === 'Pendiente' ? (
+                              <button
+                                type="button"
+                                onClick={() => handleDeliverAppOrder(order.id)}
+                                className="bg-brand-gold hover:bg-brand-gold/90 text-black px-3 py-1.5 rounded-xl font-bold font-mono text-[10px] uppercase tracking-wider transition"
+                              >
+                                Entregar Pedido
+                              </button>
+                            ) : (
+                              <span className="text-[9px] font-mono text-neutral-500 bg-neutral-900 px-2.5 py-1 rounded-full uppercase font-bold border border-neutral-850">
+                                Entregado
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {pendingOrders.length === 0 && (
+                        <div className="p-6 text-center text-neutral-500 text-xs font-mono">
+                          No hay pedidos móviles pendientes de entrega.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* PRODUCT CATALOG FOR IN-PERSON SALES */}
+                  <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <div className="pb-2 border-b border-neutral-900">
+                      <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">Catálogo de Productos (Venta Física)</h3>
+                      <p className="text-[10px] text-neutral-500 font-mono mt-0.5">Selecciona productos para agregarlos al carrito de compra física.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto no-scrollbar">
+                      {shopProductsList.map((prod) => {
+                        return (
+                          <div
+                            key={prod.id}
+                            className="bg-black border border-neutral-850 p-3 rounded-xl flex items-center justify-between gap-3 hover:border-neutral-700 transition"
+                          >
+                            <div className="space-y-0.5 text-left">
+                              <span className="text-[8px] font-mono uppercase tracking-widest text-neutral-500 bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-850">{prod.category}</span>
+                              <h4 className="text-xs font-bold text-white pt-1">{prod.name}</h4>
+                              <p className="text-xs font-mono font-bold text-brand-gold">${prod.price} USD</p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPosCart(prev => {
+                                  const existing = prev.find(item => item.product.id === prod.id);
+                                  if (existing) {
+                                    return prev.map(item => item.product.id === prod.id ? { ...item, quantity: item.quantity + 1 } : item);
+                                  }
+                                  return [...prev, { product: prod, quantity: 1 }];
+                                });
+                                onTriggerNotification(`🛍️ Se agregó ${prod.name} al carrito.`);
+                              }}
+                              className="p-2 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-brand-gold/30 rounded-xl transition text-neutral-300 hover:text-brand-gold"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
-                    <p className="text-[9px] font-mono text-neutral-500 uppercase">Efectivo Turno</p>
-                    <p className="text-base font-mono font-bold text-white">${shiftSalesCash} USD</p>
+                {/* Right Side: Virtual Checkout register & Daily cutoff */}
+                <div className="lg:col-span-5 space-y-5">
+                  
+                  {/* VIRTUAL CASH REGISTER SHOPPING CART */}
+                  <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold block pb-2 border-b border-neutral-900">
+                      Caja de Venta Física
+                    </span>
+
+                    <div className="space-y-4">
+                      
+                      {/* Associating Socio dropdown */}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Registrar Venta A:</label>
+                        <select
+                          value={cartSocioId}
+                          onChange={(e) => setCartSocioId(e.target.value)}
+                          className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl px-3 py-2 text-white outline-none focus:border-brand-gold/50"
+                        >
+                          <option value="publico">Cliente General / Público</option>
+                          {clients.map(c => (
+                            <option key={c.id} value={c.id}>{c.name} ({c.id})</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Cart Items List */}
+                      <div className="bg-black/40 border border-neutral-900 rounded-xl p-3.5 space-y-3 min-h-[120px] max-h-[200px] overflow-y-auto no-scrollbar">
+                        {posCart.map((item) => (
+                          <div key={item.product.id} className="flex items-center justify-between gap-3 border-b border-neutral-900/60 pb-2 last:border-0 last:pb-0">
+                            <div className="text-left flex-1 min-w-0">
+                              <h5 className="text-xs font-semibold text-white truncate">{item.product.name}</h5>
+                              <p className="text-[10px] font-mono text-neutral-500">${item.product.price} USD c/u</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPosCart(prev => prev.map(i => i.product.id === item.product.id ? { ...i, quantity: Math.max(1, i.quantity - 1) } : i));
+                                }}
+                                className="p-1 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 rounded text-neutral-400 hover:text-white"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="text-xs font-mono font-bold text-white w-4 text-center">{item.quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPosCart(prev => prev.map(i => i.product.id === item.product.id ? { ...i, quantity: i.quantity + 1 } : i));
+                                }}
+                                className="p-1 bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 rounded text-neutral-400 hover:text-white"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPosCart(prev => prev.filter(i => i.product.id !== item.product.id));
+                                  onTriggerNotification(`🗑️ Removido ${item.product.name} del carrito.`);
+                                }}
+                                className="p-1 bg-neutral-900 hover:bg-red-950/20 text-neutral-500 hover:text-red-400 rounded transition ml-1"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {posCart.length === 0 && (
+                          <div className="h-[100px] flex items-center justify-center text-center text-neutral-600 text-xs font-mono">
+                            Carrito vacío
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Payment Method */}
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Método de Pago</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setCartPaymentMethod('Efectivo')}
+                            className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
+                              cartPaymentMethod === 'Efectivo' 
+                                ? 'bg-white text-black border-white' 
+                                : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                            }`}
+                          >
+                            Efectivo
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCartPaymentMethod('Terminal')}
+                            className={`py-2 rounded-xl text-center text-xs font-bold border transition ${
+                              cartPaymentMethod === 'Terminal' 
+                                ? 'bg-white text-black border-white' 
+                                : 'bg-neutral-950 border-neutral-850 text-neutral-400 hover:text-white'
+                            }`}
+                          >
+                            Terminal
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Total and Checkout */}
+                      <div className="pt-2 border-t border-neutral-900 flex justify-between items-center">
+                        <span className="text-xs text-neutral-400 font-mono">TOTAL A COBRAR:</span>
+                        <span className="text-base font-mono font-bold text-brand-gold">
+                          ${posCart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)} USD
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleProcessShopSale}
+                        disabled={posCart.length === 0}
+                        className="w-full bg-brand-gold hover:bg-brand-gold/90 text-black py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-lg disabled:opacity-40"
+                      >
+                        Cobrar y Registrar Venta
+                      </button>
+                    </div>
+
                   </div>
-                  <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
-                    <p className="text-[9px] font-mono text-neutral-500 uppercase">Terminal Turno</p>
-                    <p className="text-base font-mono font-bold text-white">${shiftSalesTerminal} USD</p>
+
+                  {/* DAILY CASH DRAWER WIDGET */}
+                  <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
+                      <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Corte de Caja Diario</span>
+                      <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase animate-pulse">Cajero Operativo</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
+                        <p className="text-[9px] font-mono text-neutral-500 uppercase">Efectivo Turno</p>
+                        <p className="text-base font-mono font-bold text-white">${shiftSalesCash} USD</p>
+                      </div>
+                      <div className="bg-neutral-950 border border-neutral-900 p-3.5 rounded-xl space-y-0.5">
+                        <p className="text-[9px] font-mono text-neutral-500 uppercase">Terminal Turno</p>
+                        <p className="text-base font-mono font-bold text-white">${shiftSalesTerminal} USD</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const total = shiftSalesCash + shiftSalesTerminal;
+                        onTriggerNotification(`Corte de caja registrado para el turno. Total declarado de $${total} USD.`);
+                        setShiftSalesCash(0);
+                        setShiftSalesTerminal(0);
+                        setSalesHistory([]);
+                      }}
+                      className="w-full bg-neutral-950 hover:bg-neutral-900 text-neutral-300 border border-neutral-850 py-2.5 rounded-xl font-semibold text-xs transition uppercase tracking-wide"
+                    >
+                      Realizar Corte y Cierre de Turno
+                    </button>
                   </div>
+
                 </div>
-
-                <button
-                  onClick={() => {
-                    const total = shiftSalesCash + shiftSalesTerminal;
-                    onTriggerNotification(`Corte de caja registrado para el turno. Total declarado de $${total} USD.`);
-                    setShiftSalesCash(0);
-                    setShiftSalesTerminal(0);
-                    setSalesHistory([]);
-                  }}
-                  className="w-full bg-neutral-950 hover:bg-neutral-900 text-neutral-300 border border-neutral-850 py-2.5 rounded-xl font-semibold text-xs transition uppercase tracking-wide"
-                >
-                  Realizar Corte y Cierre de Turno
-                </button>
               </div>
-
-            </div>
+            )}
           </motion.div>
         )}
 

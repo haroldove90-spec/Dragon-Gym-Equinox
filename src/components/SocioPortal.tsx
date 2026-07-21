@@ -366,6 +366,25 @@ export default function SocioPortal({
     setTimeout(() => {
       onTriggerNotification(`✅ ¡Compra Autorizada! Cargo de $${price} USD realizado a tu tarjeta registrada.`);
       setShopCart(prev => prev + 1);
+
+      // Save order to shared localStorage for Staff
+      try {
+        const savedOrders = localStorage.getItem('eqx_pending_orders');
+        const orders = savedOrders ? JSON.parse(savedOrders) : [];
+        const newOrder = {
+          id: `ORD-${Math.floor(100 + Math.random() * 900)}`,
+          clientName: user.name || 'Molly Athlete',
+          clientId: user.id || 'SOC-MOLLY',
+          productName: prodName,
+          price: price,
+          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'Pendiente'
+        };
+        orders.unshift(newOrder);
+        localStorage.setItem('eqx_pending_orders', JSON.stringify(orders));
+      } catch (e) {
+        console.error('Error saving pending order:', e);
+      }
     }, 1200);
   };
 
