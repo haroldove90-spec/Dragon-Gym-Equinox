@@ -24,7 +24,10 @@ import {
   Sparkles,
   Play,
   RotateCcw,
-  BookOpen
+  BookOpen,
+  ShieldAlert,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { UserProfile, GymClass } from '../types';
 
@@ -351,8 +354,103 @@ export default function CoachPortal({
   const [exNotes, setExNotes] = useState('');
   const [tempExercises, setTempExercises] = useState<{ name: string; sets: number; reps: string; notes?: string }[]>([]);
 
+  // --- COACH IA INTEGRATION STATES ---
+  const [aiRoutineObjective, setAiRoutineObjective] = useState<string>('Hipertrofia muscular general');
+  const [aiRoutineInjuries, setAiRoutineInjuries] = useState<string>('Ninguna');
+  const [aiRoutineLoading, setAiRoutineLoading] = useState<boolean>(false);
+
+  const [aiRiskAlert, setAiRiskAlert] = useState<string>('');
+  const [aiRiskLoading, setAiRiskLoading] = useState<boolean>(false);
+
+  // Simulated volume report per muscle group
+  const getSocioVolumeReport = (id: string) => {
+    if (id === 'SOC-JUAN') {
+      return [
+        { group: 'Espalda / Tracción', lastWeek: 2100, thisWeek: 2250, change: '+7%' },
+        { group: 'Hombro / Empuje', lastWeek: 800, thisWeek: 1150, change: '+43.8%' },
+        { group: 'Bíceps', lastWeek: 600, thisWeek: 650, change: '+8.3%' }
+      ];
+    }
+    if (id === 'SOC-SOFIA') {
+      return [
+        { group: 'Piernas / Glúteo', lastWeek: 1500, thisWeek: 2150, change: '+43.3%' },
+        { group: 'Core / Abdomen', lastWeek: 400, thisWeek: 420, change: '+5%' }
+      ];
+    }
+    // Default (Molly)
+    return [
+      { group: 'Pecho / Pectoral', lastWeek: 1200, thisWeek: 1300, change: '+8.3%' },
+      { group: 'Hombro / Deltoides', lastWeek: 400, thisWeek: 580, change: '+45%' },
+      { group: 'Cuádriceps', lastWeek: 2500, thisWeek: 2650, change: '+6%' }
+    ];
+  };
+
+  const currentVolumeReport = getSocioVolumeReport(selectedSocioId);
+
+  // 1. handleGenerateAiRoutine: Calls /api/gemini/generar-rutina and populates the form list
+  const handleGenerateAiRoutine = async () => {
+    setAiRoutineLoading(true);
+    try {
+      const response = await fetch("/api/gemini/generar-rutina", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile: {
+            objetivo: aiRoutineObjective,
+            lesiones: aiRoutineInjuries,
+            dias: routineDays
+          },
+          machines: machinesList
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      if (data.title) setRoutineTitle(data.title);
+      if (data.daysPerWeek) setRoutineDays(data.daysPerWeek);
+      if (data.exercises && Array.isArray(data.exercises)) {
+        setTempExercises(data.exercises);
+        onTriggerNotification("✨ Gemini ha propuesto una rutina adaptada al equipamiento real. ¡Lista para tu revisión!");
+      } else {
+        onTriggerNotification("⚠️ Formato de respuesta de Gemini inesperado.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error al generar rutina: " + err.message);
+    } finally {
+      setAiRoutineLoading(false);
+    }
+  };
+
+  // 2. handleDetectInjuryRisk: Calls /api/gemini/detectar-riesgo
+  const handleDetectInjuryRisk = async () => {
+    setAiRiskLoading(true);
+    setAiRiskAlert('');
+    try {
+      const response = await fetch("/api/gemini/detectar-riesgo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          socioName: selectedSocio.name,
+          volumeReport: currentVolumeReport
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setAiRiskAlert(data.alert || "Análisis completado sin alertas críticas detectadas.");
+      onTriggerNotification("✨ Análisis de riesgo de lesión completado.");
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error de análisis de lesión: " + err.message);
+    } finally {
+      setAiRiskLoading(false);
+    }
+  };
+
   // Load routine details when switching selected athlete
   useEffect(() => {
+    setAiRiskAlert(''); // Clear alert when switching socio
     const existing = assignedRoutines[selectedSocioId];
     if (existing) {
       setRoutineTitle(existing.title);
@@ -946,6 +1044,109 @@ export default function CoachPortal({
                 )}
               </div>
 
+              {/* Sección A-2: Reporte de Volumen Semanal & Detector de Fatiga / Lesiones con IA */}
+              <div className="bg-neutral-950 border border-neutral-900 rounded-2xl p-5 space-y-4 shadow-md">
+                <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
+                  <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold flex items-center gap-1.5">
+                    <Activity className="w-4 h-4 text-brand-red" />
+                    REPORTE DE VOLUMEN SEMANAL & PREVENCIÓN DE LESIONES
+                  </span>
+                  <span className="text-[9px] font-mono text-brand-red uppercase font-bold">Monitoreo de Fatiga IA</span>
+                </div>
+
+                <p className="text-xs text-neutral-400">
+                  Volumen total semanal levantado por grupo muscular (Series × Repeticiones × Carga). Útil para detectar picos drásticos de fatiga acumulada.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tabla de Volúmenes */}
+                  <div className="border border-neutral-900 rounded-xl overflow-hidden bg-neutral-900/10">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-neutral-900/50 text-[9px] font-mono uppercase text-neutral-400 border-b border-neutral-900">
+                          <th className="py-2 px-3">Grupo Muscular</th>
+                          <th className="py-2 px-3 text-right">S. Anterior</th>
+                          <th className="py-2 px-3 text-right">S. Actual</th>
+                          <th className="py-2 px-3 text-right text-brand-gold">Var %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentVolumeReport.map((vol, idx) => {
+                          const isHigh = parseFloat(vol.change) > 30;
+                          return (
+                            <tr key={idx} className="border-b border-neutral-900/50 hover:bg-neutral-900/20 text-neutral-300">
+                              <td className="py-2 px-3 font-medium text-white text-[11px]">{vol.group}</td>
+                              <td className="py-2 px-3 text-right font-mono text-neutral-400">{vol.lastWeek.toLocaleString()} kg</td>
+                              <td className="py-2 px-3 text-right font-mono text-white">{vol.thisWeek.toLocaleString()} kg</td>
+                              <td className={`py-2 px-3 text-right font-mono font-bold ${isHigh ? 'text-brand-red animate-pulse' : 'text-emerald-400'}`}>
+                                {vol.change}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Consola de Análisis IA */}
+                  <div className="flex flex-col justify-between p-4 rounded-xl border border-neutral-850 bg-neutral-900/20">
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-mono text-brand-red uppercase tracking-widest font-bold flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-brand-red" />
+                        Prevención con Gemini
+                      </span>
+                      <p className="text-[11px] text-neutral-400 leading-relaxed">
+                        Analiza las cargas del atleta de las últimas semanas para detectar incrementos peligrosos de volumen que puedan causar lesiones por sobrecarga.
+                      </p>
+                    </div>
+
+                    <div className="pt-3">
+                      <button
+                        onClick={handleDetectInjuryRisk}
+                        disabled={aiRiskLoading}
+                        className="w-full bg-brand-red/10 hover:bg-brand-red/20 border border-brand-red/30 text-brand-red py-2.5 px-4 rounded-xl text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {aiRiskLoading ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            Analizando volumen de carga...
+                          </>
+                        ) : (
+                          <>
+                            <ShieldAlert className="w-3.5 h-3.5 text-brand-red" />
+                            Detectar Riesgo de Lesión / Fatiga
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Caja de alerta generada */}
+                <AnimatePresence>
+                  {aiRiskAlert && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className={`p-4 rounded-xl border flex gap-3 items-start ${
+                        aiRiskAlert.toLowerCase().includes("crítica") || aiRiskAlert.toLowerCase().includes("alerta") || aiRiskAlert.toLowerCase().includes("riesgo")
+                          ? 'bg-brand-red/5 border-brand-red/30 text-red-200'
+                          : 'bg-emerald-950/10 border-emerald-900/30 text-emerald-200'
+                      }`}
+                    >
+                      <div className="w-5 h-5 rounded-full bg-black/40 flex items-center justify-center shrink-0 mt-0.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-brand-red" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-mono uppercase tracking-wider font-bold text-neutral-400">DIAGNÓSTICO PREVENTIVO IA:</p>
+                        <p className="text-xs leading-relaxed font-sans">{aiRiskAlert}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* Sección B: Ajuste o Asignación Manual de Rutinas */}
               <div className="bg-neutral-950 border border-neutral-900 rounded-2xl p-5 space-y-5 shadow-md">
                 <div className="flex justify-between items-center pb-2 border-b border-neutral-900">
@@ -957,6 +1158,69 @@ export default function CoachPortal({
                 </div>
 
                 <div className="space-y-4">
+                  {/* CONSOLA INTELIGENTE: GENERADOR DE RUTINAS CON IA (DRAGON PRESCRIPCIÓN) */}
+                  <div className="p-4 rounded-xl border bg-brand-gold/5 border-brand-gold/20 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
+                        <Sparkles className="w-4 h-4 text-brand-gold" />
+                        Generador de Rutinas Basado en Equipamiento Real
+                      </span>
+                      <span className="text-[8px] font-mono bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded font-bold uppercase">Dragon Prescripción IA</span>
+                    </div>
+                    
+                    <p className="text-[11px] text-neutral-400">
+                      Genera automáticamente una propuesta de rutina complementaria basada en el inventario real de máquinas del club ({machinesList.length} máquinas cargadas) y el perfil deportivo del socio.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="space-y-1">
+                        <label className="text-[8px] font-mono text-neutral-400 uppercase">Objetivo Deportivo</label>
+                        <select
+                          value={aiRoutineObjective}
+                          onChange={(e) => setAiRoutineObjective(e.target.value)}
+                          className="w-full text-xs bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-white outline-none focus:border-brand-gold font-mono"
+                        >
+                          <option value="Hipertrofia muscular general">Hipertrofia Muscular General</option>
+                          <option value="Aumento de Fuerza y Potencia">Aumento de Fuerza y Potencia</option>
+                          <option value="Recondicionamiento físico general">Recondicionamiento Físico General</option>
+                          <option value="Quema de grasa y definición muscular">Quema de Grasa y Definición</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[8px] font-mono text-neutral-400 uppercase">Lesiones o Restricciones</label>
+                        <select
+                          value={aiRoutineInjuries}
+                          onChange={(e) => setAiRoutineInjuries(e.target.value)}
+                          className="w-full text-xs bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-white outline-none focus:border-brand-gold font-mono text-red-300"
+                        >
+                          <option value="Ninguna">Ninguna lesión o dolor activo</option>
+                          <option value="Dolor de rodilla (evitar sentadillas pesadas)">Dolor de Rodilla (Evitar Prensa/Squat pesado)</option>
+                          <option value="Molestia en hombro o manguito rotador">Molestia en Hombro (Evitar presses pesados)</option>
+                          <option value="Lumbalgia leve o dolor de espalda baja">Lumbalgia Leve (Evitar peso muerto libre)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleGenerateAiRoutine}
+                      disabled={aiRoutineLoading}
+                      className="w-full bg-neutral-900 hover:bg-neutral-850 border border-brand-gold/30 text-brand-gold hover:text-white py-2.5 px-4 rounded-xl text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {aiRoutineLoading ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand-gold" />
+                          Generando propuesta con Gemini...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+                          Diseñar Rutina con IA (Equipamiento Real)
+                        </>
+                      )}
+                    </button>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-[10px] uppercase font-mono tracking-wider text-neutral-400 block font-bold">

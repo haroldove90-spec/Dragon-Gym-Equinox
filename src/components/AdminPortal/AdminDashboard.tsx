@@ -141,48 +141,221 @@ export default function AdminDashboard({ userCount, revenueTotal }: AdminDashboa
       `Haz clic en "Generar Reporte de IA" para iniciar el análisis profundo de Dragon Sentinel.`;
   });
   const [churnRiskClients, setChurnRiskClients] = useState([
-    { id: 'DG-ATHLETE-2210', name: 'John Doe', email: 'john.doe@gmail.com', lastCheckIn: 'Hace 14 días', risk: '92%', status: 'Pendiente', campaignSent: false },
-    { id: 'DG-ATHLETE-4099', name: 'Sarah Connor', email: 'sarah.connor@cyberdyne.com', lastCheckIn: 'Hace 10 días', risk: '78%', status: 'Pendiente', campaignSent: false },
-    { id: 'DG-ATHLETE-4512', name: 'Kyle Reese', email: 'kyle.reese@resistance.org', lastCheckIn: 'Hace 12 días', risk: '85%', status: 'Pendiente', campaignSent: false },
+    { 
+      id: 'DG-ATHLETE-2210', 
+      name: 'John Doe', 
+      email: 'john.doe@gmail.com', 
+      lastCheckIn: 'Hace 14 días', 
+      risk: '92%', 
+      riskLevel: 'Alto',
+      status: 'Pendiente', 
+      campaignSent: false,
+      visits30Days: '0 visitas',
+      daysToExpiry: 4,
+      purchases: 'Proteína whey limpia, Shaker metálico',
+      objective: 'Hipertrofia de Piernas y Fuerza',
+      reason: 'No ha asistido al club en las últimas dos semanas y su membresía expira en 4 días.',
+      rescueMsg: 'Hola John Doe, te extrañamos en Dragon Gym Polanco. Notamos que no has venido en 14 días. ¡No dejes ir tu progreso en hipertrofia de piernas! Ven esta semana y recibe una bebida isotónica gratis en recepción.'
+    },
+    { 
+      id: 'DG-ATHLETE-4099', 
+      name: 'Sarah Connor', 
+      email: 'sarah.connor@cyberdyne.com', 
+      lastCheckIn: 'Hace 10 días', 
+      risk: '78%', 
+      riskLevel: 'Medio',
+      status: 'Pendiente', 
+      campaignSent: false,
+      visits30Days: '2 visitas',
+      daysToExpiry: 12,
+      purchases: 'Guantes de entrenamiento, Cinto de halterofilia',
+      objective: 'Fuerza Funcional y Resistencia',
+      reason: 'Baja asistencia de 2 visitas en el último mes. Membresía vence en 12 días.',
+      rescueMsg: 'Hola Sarah, mantén viva tu racha en Dragon Gym. Tu objetivo de fuerza funcional es clave. ¡Te esperamos para entrenar hoy!'
+    },
+    { 
+      id: 'DG-ATHLETE-4512', 
+      name: 'Kyle Reese', 
+      email: 'kyle.reese@resistance.org', 
+      lastCheckIn: 'Hace 12 días', 
+      risk: '85%', 
+      riskLevel: 'Alto',
+      status: 'Pendiente', 
+      campaignSent: false,
+      visits30Days: '1 visita',
+      daysToExpiry: 8,
+      purchases: 'Electrólitos de Limón, Creatina pura',
+      objective: 'Acondicionamiento Físico de Combate',
+      reason: 'Ausente por 12 días con una sola visita este mes. Vencimiento en 8 días.',
+      rescueMsg: 'Hola Kyle, te esperamos de regreso en Dragon Gym para retomar el acondicionamiento físico de combate. ¡Recuerda hidratarte con tus electrólitos favoritos!'
+    },
   ]);
 
   const [campaignTemplate, setCampaignTemplate] = useState('Te extrañamos en Dragon Gym. Ven esta semana y recibe un shaker de proteína gratis en mostrador. ¡Mantén tu racha!');
+  const [predictingChurnId, setPredictingChurnId] = useState<string | null>(null);
+  const [selectedChurnClient, setSelectedChurnClient] = useState<any>(null);
 
-  const handleGenerateReport = () => {
+  const [analyzingCamera, setAnalyzingCamera] = useState<boolean>(false);
+  const [cameraAnalysis, setCameraAnalysis] = useState<{
+    [key: string]: {
+      cameraCount: number;
+      appCount: number;
+      discrepancy: boolean;
+      alerts: string[];
+      saturation: number;
+    }
+  }>({
+    musculacion: {
+      cameraCount: 14,
+      appCount: 12,
+      discrepancy: true,
+      alerts: ["Aviso: Se detectan 2 personas no registradas en musculación (posible evasión de check-in)."],
+      saturation: 80
+    },
+    cardio: {
+      cameraCount: 8,
+      appCount: 8,
+      discrepancy: false,
+      alerts: ["Cruce correcto: 8 personas detectadas en cámara, 8 check-ins activos."],
+      saturation: 32
+    },
+    recepcion: {
+      cameraCount: 3,
+      appCount: 2,
+      discrepancy: true,
+      alerts: ["Alerta Recepción: 1 persona detectada sin código QR validado en mostrador."],
+      saturation: 15
+    },
+  });
+
+  const handleGenerateReport = async () => {
     setIsGeneratingReport(true);
-    setTimeout(() => {
-      const generated = `[DRAGON SENTINEL AUTOMATED MORNING REPORT - SECURE OPERATIONAL INSIGHTS]
-Fecha de Auditoría: ${new Date().toLocaleDateString('es-MX')}
-Modelo de IA: Dragon Brain v3.5-Intelligence
-----------------------------------------------------------------------------------
-1. MONITOREO DE ASISTENCIA Y FLUJO
-- Asistencia acumulada de ayer: 142 ingresos de socios.
-- Hora pico máxima: 18:00 - 20:00 con aforo al 92% de saturación en Peso Libre.
-- Tiempo de permanencia promedio por socio registrado: 72 minutos.
-
-2. SUSCRIPCIONES Y FINANZAS
-- Renovaciones detectadas hoy: 3 atletas renovados en mostrador.
-- Ingresos brutos mensuales consolidados: $${revenueTotal.toLocaleString()} USD.
-- Gasto Operativo configurado: $${totalExpenses.toLocaleString()} USD.
-- Utilidad neta de gerencia proyectada: $${netUtility.toLocaleString()} USD.
-- Margen de utilidad actual: ${profitMargin}% sobre ingresos totales.
-
-3. ALERTA CRÍTICA: RETENCIÓN DE CLIENTES (CHURN)
-- Riesgo de abandono (Churn) actual: ${churnRate}% del aforo registrado.
-- 3 Socios detectados con inactividad superior a 10 días lectivos:
-  * John Doe (DG-ATHLETE-2210) - Riesgo Churn: 92% (Última visita: Hace 14 días)
-  * Kyle Reese (DG-ATHLETE-4512) - Riesgo Churn: 85% (Última visita: Hace 12 días)
-  * Sarah Connor (DG-ATHLETE-4099) - Riesgo Churn: 78% (Última visita: Hace 10 días)
-
-RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelización y re-engagement ofreciendo bebida isotónica de cortesía en su próximo ingreso de re-activación.`;
-      
-      setMorningReport(generated);
-      localStorage.setItem('eqx_morning_report', generated);
-      setIsGeneratingReport(false);
-      
-      const evt = new CustomEvent('app-notification', { detail: `✨ Reporte matutino gerencial generado por la IA Administrativa.` });
+    try {
+      const response = await fetch("/api/gemini/reporte-matutino", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          asistenciasCount: 142,
+          pagosCount: 17,
+          ingresosTotal: revenueTotal || 8240,
+          vencimientosHoy: 4,
+          clientesRiesgo: churnRiskClients.map(c => ({ name: c.name, risk: c.risk, lastCheckIn: c.lastCheckIn }))
+        })
+      });
+      const data = await response.json();
+      if (data.text) {
+        setMorningReport(data.text);
+        localStorage.setItem('eqx_morning_report', data.text);
+        const evt = new CustomEvent('app-notification', { detail: `✨ Reporte matutino gerencial generado por la IA Administrativa.` });
+        window.dispatchEvent(evt);
+      } else {
+        throw new Error(data.error || "No se pudo generar el reporte.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      const evt = new CustomEvent('app-notification', { detail: `❌ Error de IA: ${error.message || "Servicio temporalmente no disponible"}` });
       window.dispatchEvent(evt);
-    }, 2000);
+    } finally {
+      setIsGeneratingReport(false);
+    }
+  };
+
+  const handlePredictChurn = async (id: string) => {
+    setPredictingChurnId(id);
+    const client = churnRiskClients.find(c => c.id === id);
+    if (!client) return;
+
+    try {
+      const response = await fetch("/api/gemini/predecir-churn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: client.name,
+          visits30Days: client.visits30Days,
+          daysToExpiry: client.daysToExpiry,
+          purchases: client.purchases,
+          objective: client.objective
+        })
+      });
+      const data = await response.json();
+      if (data.risk) {
+        setChurnRiskClients(prev => prev.map(c => c.id === id ? {
+          ...c,
+          risk: data.probability || c.risk,
+          riskLevel: data.risk || c.riskLevel,
+          reason: data.reason || c.reason,
+          rescueMsg: data.rescueMessage || c.rescueMsg
+        } : c));
+
+        const updatedClient = {
+          ...client,
+          risk: data.probability || client.risk,
+          riskLevel: data.risk || client.riskLevel,
+          reason: data.reason || client.reason,
+          rescueMsg: data.rescueMessage || client.rescueMsg
+        };
+        setSelectedChurnClient(updatedClient);
+
+        if (data.rescueMessage) {
+          setCampaignTemplate(data.rescueMessage);
+        }
+
+        const evt = new CustomEvent('app-notification', { detail: `🎯 Diagnóstico Churn IA completado para ${client.name}.` });
+        window.dispatchEvent(evt);
+      } else {
+        throw new Error(data.error || "No se pudo predecir el Churn.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      const evt = new CustomEvent('app-notification', { detail: `❌ Error de IA Churn: ${error.message || "Falla al predecir"}` });
+      window.dispatchEvent(evt);
+    } finally {
+      setPredictingChurnId(null);
+    }
+  };
+
+  const handleAnalyzeCamera = async (cam: 'musculacion' | 'cardio' | 'recepcion') => {
+    setAnalyzingCamera(true);
+    const mockAppCheckIns = cam === 'musculacion' 
+      ? [{ name: "John Doe" }, { name: "Tony Stark" }, { name: "Steve Rogers" }]
+      : cam === 'cardio'
+        ? [{ name: "Sarah Connor" }, { name: "Marcus Wright" }]
+        : [{ name: "Kyle Reese" }];
+
+    try {
+      const response = await fetch("/api/gemini/analizar-camaras", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cameraName: cam,
+          recentCheckIns: mockAppCheckIns
+        })
+      });
+      const data = await response.json();
+      if (typeof data.cameraCount === 'number') {
+        setCameraAnalysis(prev => ({
+          ...prev,
+          [cam]: {
+            cameraCount: data.cameraCount,
+            appCount: data.appCount,
+            discrepancy: data.discrepancy,
+            alerts: data.alerts || [],
+            saturation: data.saturation || 50
+          }
+        }));
+
+        const evt = new CustomEvent('app-notification', { detail: `📹 Análisis de visión por computadora YOLOv8 completado para CAM_${cam.toUpperCase()}.` });
+        window.dispatchEvent(evt);
+      } else {
+        throw new Error(data.error || "No se pudo analizar la cámara.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      const evt = new CustomEvent('app-notification', { detail: `❌ Error Visión IA: ${error.message || "Falla al analizar video"}` });
+      window.dispatchEvent(evt);
+    } finally {
+      setAnalyzingCamera(false);
+    }
   };
 
   const handleSendCampaign = (id: string, name: string) => {
@@ -193,7 +366,7 @@ RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelizac
 
   const handleLaunchAllCampaigns = () => {
     setChurnRiskClients(prev => prev.map(c => ({ ...c, campaignSent: true, status: 'Campaña Enviada' })));
-    const evt = new CustomEvent('app-notification', { detail: `🚀 Campaña global enviada a los 3 socios en riesgo de deserción.` });
+    const evt = new CustomEvent('app-notification', { detail: `🚀 Campaña global enviada a los socios en riesgo de deserción.` });
     window.dispatchEvent(evt);
   };
 
@@ -636,7 +809,11 @@ RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelizac
                       {['musculacion', 'cardio', 'recepcion'].map((cam) => (
                         <button
                           key={cam}
-                          onClick={() => setActiveCamera(cam as any)}
+                          onClick={() => {
+                            setActiveCamera(cam as any);
+                            // Auto-analyze camera when switching
+                            handleAnalyzeCamera(cam as any);
+                          }}
                           className={`px-2 py-1 rounded text-[9px] font-mono font-bold uppercase transition ${
                             activeCamera === cam 
                               ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
@@ -649,36 +826,81 @@ RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelizac
                     </div>
                   </div>
 
-                  {/* Camera view screen */}
+                  {/* Camera view screen with holographic scanning lines */}
                   <div className="relative aspect-video w-full rounded-xl bg-black border border-neutral-850 overflow-hidden flex flex-col justify-between p-4 shadow-2xl">
                     <div className="absolute inset-0 bg-radial-gradient from-transparent to-black/70 pointer-events-none" />
                     
+                    {/* Visual Scanning Effect */}
+                    {analyzingCamera && (
+                      <div className="absolute inset-x-0 h-0.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-bounce z-20" />
+                    )}
+
                     {/* Visual elements */}
                     <div className="flex justify-between items-start z-10 font-mono text-[9px]">
-                      <span className="text-emerald-400 bg-black/60 px-2 py-1 rounded border border-emerald-500/20">
-                        🔴 LIVE FEED: CAM_{activeCamera.toUpperCase()}
+                      <span className="text-emerald-400 bg-black/80 px-2 py-1 rounded border border-emerald-500/20 flex items-center gap-1.5 font-bold">
+                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping" />
+                        LIVE STREAM: CAM_{activeCamera.toUpperCase()}
                       </span>
-                      <span className="text-neutral-400 bg-black/60 px-2 py-1 rounded">
-                        RESOLUCIÓN: 1080P • AI DETECT: ACTIVO
+                      <span className="text-neutral-400 bg-black/80 px-2 py-1 rounded">
+                        RTSP SECURE • YOLOv8 DETECT: ON
                       </span>
                     </div>
 
                     {/* Camera Feed Mock Graphic representation */}
-                    <div className="flex-1 flex flex-col items-center justify-center space-y-3 py-6">
-                      <div className="relative border-2 border-dashed border-emerald-500/20 w-44 h-24 rounded-lg flex items-center justify-center">
-                        <div className="absolute top-2 left-2 text-[8px] font-mono text-emerald-400 bg-emerald-950/40 px-1 rounded">HUMAN_09</div>
-                        <div className="absolute bottom-2 right-2 text-[8px] font-mono text-emerald-400 font-bold bg-black px-1 rounded border border-emerald-500/30">98.2% CONF</div>
-                        <div className="w-10 h-10 rounded-full border border-emerald-400/50 flex items-center justify-center bg-emerald-500/5">
-                          <Users className="w-5 h-5 text-emerald-400 animate-pulse" />
+                    <div className="flex-1 flex flex-col items-center justify-center space-y-3 py-4">
+                      {analyzingCamera ? (
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin" />
+                          <p className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest animate-pulse">Sincronizando feed RTSP...</p>
                         </div>
-                      </div>
-                      <p className="text-[10px] font-mono text-neutral-400">Se detectaron <span className="text-emerald-400 font-bold">14 atletas</span> realizando entrenamiento activo.</p>
+                      ) : (
+                        <div className="relative border-2 border-dashed border-emerald-500/20 w-44 h-24 rounded-lg flex items-center justify-center">
+                          {/* Simulated YOLO Detection Bounding Box */}
+                          <div className="absolute -top-3 -left-3 border border-emerald-500 bg-emerald-950/80 px-1 py-0.5 rounded text-[8px] font-mono text-emerald-400 font-bold uppercase">
+                            ATHLETE_DETECTED (98.4%)
+                          </div>
+                          
+                          {/* Real-time Counts overlay */}
+                          <div className="text-center space-y-1">
+                            <p className="text-xs font-mono font-bold text-white">
+                              Conteo IA: <span className="text-emerald-400">{cameraAnalysis[activeCamera]?.cameraCount || 12}</span>
+                            </p>
+                            <p className="text-[9px] font-mono text-neutral-400">
+                              App Check-ins: {cameraAnalysis[activeCamera]?.appCount || 10}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex justify-between items-center z-10 text-[9px] font-mono text-neutral-500 bg-black/50 p-2 rounded">
-                      <span>ZONA: DRAGON GYM CENTRAL</span>
-                      <span>RED NEURONAL: YOLOv8_DRAGON_PRO</span>
+                    <div className="flex justify-between items-center z-10 text-[9px] font-mono text-neutral-400 bg-black/80 p-2.5 rounded border border-neutral-850">
+                      <span>Cruce: {cameraAnalysis[activeCamera]?.discrepancy ? '⚠️ DISCREPANCIA DETECTADA' : '✅ COMPATIBLE'}</span>
+                      <span className="text-emerald-400 font-bold">Saturación: {cameraAnalysis[activeCamera]?.saturation || 50}%</span>
                     </div>
+                  </div>
+
+                  {/* Operational Audit Actions and Alerts */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => handleAnalyzeCamera(activeCamera)}
+                      disabled={analyzingCamera}
+                      className="w-full py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-bold text-[10px] font-mono uppercase rounded-xl transition flex items-center justify-center gap-2"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${analyzingCamera ? 'animate-spin' : ''}`} />
+                      {analyzingCamera ? 'Auditando Flujo RTSP...' : 'Ejecutar Auditoría de Visión por Computadora (IA)'}
+                    </button>
+
+                    {/* Alerts display */}
+                    {cameraAnalysis[activeCamera]?.alerts && cameraAnalysis[activeCamera].alerts.length > 0 && (
+                      <div className="space-y-1.5">
+                        {cameraAnalysis[activeCamera].alerts.map((alert, idx) => (
+                          <div key={idx} className="bg-red-500/5 border border-red-500/25 px-3 py-2 rounded-xl text-left text-[10px] font-mono text-red-400 flex items-start gap-2">
+                            <span className="text-red-500 font-bold">⚠️</span>
+                            <span>{alert}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -847,27 +1069,53 @@ RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelizac
 
                   <div className="divide-y divide-neutral-900">
                     {churnRiskClients.map((client) => {
+                      const isSelected = selectedChurnClient?.id === client.id;
                       return (
-                        <div key={client.id} className="py-3 flex justify-between items-center gap-4 text-left">
-                          <div>
+                        <div 
+                          key={client.id} 
+                          onClick={() => setSelectedChurnClient(client)}
+                          className={`py-3.5 px-3 rounded-xl transition cursor-pointer flex justify-between items-center gap-4 text-left ${
+                            isSelected ? 'bg-neutral-950 border border-brand-gold/30' : 'hover:bg-neutral-950/40 border border-transparent'
+                          }`}
+                        >
+                          <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <h4 className="text-xs font-bold text-white">{client.name}</h4>
                               <span className="text-[8px] font-mono text-neutral-500">{client.id}</span>
                             </div>
-                            <p className="text-[10px] text-neutral-400 mt-0.5">Ausente: {client.lastCheckIn} • Churn risk: <span className="text-red-400 font-bold font-mono">{client.risk}</span></p>
+                            <p className="text-[10px] text-neutral-400 mt-0.5">
+                              Ausente: <span className="text-white">{client.lastCheckIn}</span> • Probabilidad Churn: <span className="text-red-400 font-bold font-mono">{client.risk}</span>
+                            </p>
+                            <p className="text-[9px] text-neutral-500 font-mono mt-0.5">Objetivo: {client.objective}</p>
                           </div>
 
-                          <button
-                            onClick={() => handleSendCampaign(client.id, client.name)}
-                            disabled={client.campaignSent}
-                            className={`px-3 py-1.5 rounded text-[9px] font-mono font-bold uppercase transition border ${
-                              client.campaignSent 
-                                ? 'bg-neutral-950 border-neutral-850 text-neutral-500 cursor-not-allowed' 
-                                : 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400 hover:border-red-500/60'
-                            }`}
-                          >
-                            {client.campaignSent ? 'Camp. Enviada ✔' : 'Lanzar Campaña'}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePredictChurn(client.id);
+                              }}
+                              disabled={predictingChurnId === client.id}
+                              className="px-2.5 py-1.5 bg-brand-gold/15 hover:bg-brand-gold/25 border border-brand-gold/30 text-brand-gold rounded text-[9px] font-mono font-bold uppercase transition flex items-center gap-1"
+                            >
+                              {predictingChurnId === client.id ? 'Prediciendo...' : 'Predecir IA ✦'}
+                            </button>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSendCampaign(client.id, client.name);
+                              }}
+                              disabled={client.campaignSent}
+                              className={`px-2.5 py-1.5 rounded text-[9px] font-mono font-bold uppercase transition border ${
+                                client.campaignSent 
+                                  ? 'bg-neutral-950 border-neutral-850 text-neutral-500 cursor-not-allowed' 
+                                  : 'bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400 hover:border-red-500/60'
+                              }`}
+                            >
+                              {client.campaignSent ? 'Enviado ✔' : 'Rescatar'}
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -881,20 +1129,52 @@ RECOMENDACIÓN DE ACCIÓN: Lanzar de inmediato campaña automática de fidelizac
                   </button>
                 </div>
 
-                {/* 2. Interactive Template Campaign editor */}
-                <div className="lg:col-span-5 bg-neutral-900/10 border border-neutral-900 p-5 rounded-2xl flex flex-col justify-between">
+                {/* 2. Interactive Template Campaign editor and Detail Panel */}
+                <div className="lg:col-span-5 bg-neutral-900/10 border border-neutral-900 p-5 rounded-2xl flex flex-col justify-between space-y-4">
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 pb-2 border-b border-neutral-900">
                       <Send className="w-4 h-4 text-brand-gold" />
                       <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">Campaña de Fidelización</h3>
                     </div>
 
+                    {/* Detailed diagnosis from selected client */}
+                    {selectedChurnClient ? (
+                      <div className="bg-black/60 border border-neutral-850 p-3 rounded-xl space-y-2.5 text-left">
+                        <div className="flex justify-between items-center pb-1.5 border-b border-neutral-900">
+                          <span className="text-[10px] font-mono text-brand-gold uppercase font-bold">Análisis Churn de {selectedChurnClient.name}</span>
+                          <span className="text-[9px] font-mono text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20 font-bold uppercase">{selectedChurnClient.riskLevel || 'ALTO'} RISK</span>
+                        </div>
+                        
+                        <div className="space-y-1 text-[10px]">
+                          <p className="text-neutral-400 font-sans leading-relaxed">
+                            <strong className="text-neutral-200">Justificación de IA:</strong> {selectedChurnClient.reason || 'Haz clic en "Predecir IA" para generar un diagnóstico heurístico con Gemini.'}
+                          </p>
+                          <p className="text-neutral-500 font-mono">
+                            Compras previas: {selectedChurnClient.purchases || 'Ninguna'}
+                          </p>
+                        </div>
+
+                        {selectedChurnClient.rescueMsg && (
+                          <button
+                            onClick={() => setCampaignTemplate(selectedChurnClient.rescueMsg)}
+                            className="w-full py-1.5 bg-brand-gold/10 hover:bg-brand-gold/20 border border-brand-gold/20 text-brand-gold font-mono text-[9px] font-bold uppercase rounded-lg transition"
+                          >
+                            Cargar Mensaje de Rescate IA ✔
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="bg-black/20 border border-dashed border-neutral-850 p-4 rounded-xl text-center">
+                        <p className="text-[10px] font-mono text-neutral-500">Selecciona un socio para ver su diagnóstico analítico de Churn.</p>
+                      </div>
+                    )}
+
                     <div className="space-y-1.5 text-left">
-                      <label className="text-[9px] font-mono text-neutral-400 uppercase">Plantilla de Notificación Push & WhatsApp</label>
+                      <label className="text-[9px] font-mono text-neutral-400 uppercase">Mensaje Persuasivo de WhatsApp</label>
                       <textarea
                         value={campaignTemplate}
                         onChange={(e) => setCampaignTemplate(e.target.value)}
-                        rows={3}
+                        rows={4}
                         className="w-full bg-neutral-950 border border-neutral-850 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-gold/50 font-sans resize-none"
                         placeholder="Escribe el mensaje persuasivo..."
                       />

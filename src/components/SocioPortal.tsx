@@ -484,6 +484,129 @@ Garantía de Acceso Concedida.
     onTriggerNotification("🔔 Alertas marcadas como leídas.");
   };
 
+  // --- DRAGON IA REAL INTEGRATION STATES & HANDLERS ---
+  const [aiProgressText, setAiProgressText] = useState<string>('Hola. Haz clic en el botón de abajo para que Gemini analice tu historial fisicoquímico de las últimas semanas.');
+  const [aiProgressLoading, setAiProgressLoading] = useState<boolean>(false);
+
+  const [aiOverloadText, setAiOverloadText] = useState<string>('Haz clic abajo para recibir sugerencias de sobrecarga progresiva y evitar estancamientos en tu rutina.');
+  const [aiOverloadLoading, setAiOverloadLoading] = useState<boolean>(false);
+
+  const [aiNotificationText, setAiNotificationText] = useState<string>('');
+  const [aiNotificationLoading, setAiNotificationLoading] = useState<boolean>(false);
+  const [attendancePattern, setAttendancePattern] = useState<string>('asistió Lunes, Miércoles, Viernes de forma constante');
+
+  const [aiSubstitutesText, setAiSubstitutesText] = useState<string>('');
+  const [aiSubstitutesLoading, setAiSubstitutesLoading] = useState<boolean>(false);
+  const [subTargetExercise, setSubTargetExercise] = useState<string>('Prensa de Piernas 45° de Poder');
+
+  // 1. IA de Análisis de Progreso Fisicoquímico
+  const handleGenerateProgressAI = async () => {
+    setAiProgressLoading(true);
+    try {
+      const response = await fetch("/api/gemini/progreso", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.name,
+          history: progressHistory
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setAiProgressText(data.text || "No se pudo generar el diagnóstico.");
+      onTriggerNotification("✨ Diagnóstico de progreso fisicoquímico actualizado.");
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error: " + err.message);
+    } finally {
+      setAiProgressLoading(false);
+    }
+  };
+
+  // 2. IA de Sobrecarga Progresiva (Rutinas Inteligentes)
+  const handleGenerateOverloadAI = async () => {
+    setAiOverloadLoading(true);
+    try {
+      const response = await fetch("/api/gemini/sobrecarga", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.name,
+          routine: coachRoutine || { title: "Fuerza General Dragon", exercises: [{ name: "Prensa", sets: 4, reps: 10, notes: "Subir peso gradualmente" }] }
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setAiOverloadText(data.text || "No se pudieron obtener sugerencias.");
+      onTriggerNotification("✨ Alerta de sobrecarga progresiva actualizada.");
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error: " + err.message);
+    } finally {
+      setAiOverloadLoading(false);
+    }
+  };
+
+  // 3. IA de Generación de Push Notifications Personalizadas
+  const handleGeneratePushNotificationAI = async () => {
+    setAiNotificationLoading(true);
+    try {
+      const response = await fetch("/api/gemini/notificacion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.name,
+          attendancePattern: attendancePattern
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      const text = data.text || "Tu cuerpo te extraña en Dragon GYM. ¡Un entrenamiento corto hoy es genial!";
+      setAiNotificationText(text);
+
+      // Save in pushAlerts so the member can view it in Módulo 5 (Tab 5: Notificaciones)
+      const newAlert = {
+        id: `alert-${Date.now()}`,
+        type: 'motivacional',
+        text: `✨ Dragon IA: ${text}`,
+        date: 'Hoy • Reciente',
+        read: false
+      };
+      setPushAlerts(prev => [newAlert, ...prev]);
+      onTriggerNotification("🔔 Alerta motivacional generada y guardada.");
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error: " + err.message);
+    } finally {
+      setAiNotificationLoading(false);
+    }
+  };
+
+  // 4. Sustituto Inteligente de Ejercicios
+  const handleGenerateSubstituteAI = async () => {
+    setAiSubstitutesLoading(true);
+    try {
+      const response = await fetch("/api/gemini/sustituto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.name,
+          exercise: subTargetExercise,
+          machines: machinesList
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setAiSubstitutesText(data.text || "No se encontraron sustitutos idóneos.");
+      onTriggerNotification("✨ Recomendación de sustituto de ejercicio generada.");
+    } catch (err: any) {
+      console.error(err);
+      onTriggerNotification("❌ Error: " + err.message);
+    } finally {
+      setAiSubstitutesLoading(false);
+    }
+  };
+
   const isMembershipActive = !user.membershipLevel.toLowerCase().includes('vencid');
 
   return (
@@ -1195,15 +1318,171 @@ Garantía de Acceso Concedida.
                   <Sparkles className="w-4 h-4 text-brand-gold animate-pulse" />
                 </div>
 
-                <div className="space-y-3.5">
-                  <div className="p-4 rounded-xl border bg-brand-gold/5 border-brand-gold/20 space-y-2">
-                    <p className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
-                      <Sparkles className="w-4 h-4 text-brand-gold" />
-                      Resumen Semanal de Progreso
+                <div className="space-y-4">
+                  {/* Bloque 1: IA de Análisis de Progreso Fisicoquímico */}
+                  <div className="p-4 rounded-xl border bg-brand-gold/5 border-brand-gold/20 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
+                        <TrendingUp className="w-4 h-4 text-brand-gold" />
+                        Diagnóstico de Progreso Fisicoquímico
+                      </p>
+                      <span className="text-[8px] font-mono bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded font-bold uppercase">Real-Time IA</span>
+                    </div>
+                    
+                    <p className="text-xs text-neutral-300 leading-relaxed font-light italic">
+                      "{aiProgressText}"
                     </p>
+
+                    <button
+                      onClick={handleGenerateProgressAI}
+                      disabled={aiProgressLoading}
+                      className="w-full bg-neutral-900 hover:bg-neutral-850 border border-brand-gold/30 text-brand-gold hover:text-white py-1.5 px-3 rounded-lg text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {aiProgressLoading ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          Procesando historial con Gemini...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3.5 h-3.5 text-brand-gold" />
+                          Generar Diagnóstico Real de Progreso
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Bloque 2: IA de Sobrecarga Progresiva (Rutinas Inteligentes) */}
+                  <div className="p-4 rounded-xl border bg-neutral-900/40 border-neutral-850 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
+                        <Activity className="w-4 h-4 text-brand-gold" />
+                        IA de Sobrecarga Progresiva
+                      </p>
+                      <span className="text-[8px] font-mono bg-brand-gold/10 text-brand-gold/80 px-2 py-0.5 rounded uppercase">Análisis Hoist/Row</span>
+                    </div>
+
                     <p className="text-xs text-neutral-300 leading-relaxed font-light">
-                      "Hola Molly. Hemos analizado tus bitácoras de las últimas 3 semanas. Estás registrando una reducción consistente del <span className="text-brand-gold font-bold">0.3% de grasa corporal</span> por semana. Sin embargo, hemos detectado que llevas 3 semanas sin aumentar la carga de tu Prensa a 45°. Tu sobrecarga progresiva se ha estancado ligeramente. Recomendamos incrementar la carga en 2.5 kg adicionales en tu próxima sesión de tren inferior."
+                      {aiOverloadText}
                     </p>
+
+                    <button
+                      onClick={handleGenerateOverloadAI}
+                      disabled={aiOverloadLoading}
+                      className="w-full bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white py-1.5 px-3 rounded-lg text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {aiOverloadLoading ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          Calculando sobrecarga...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 text-brand-gold" />
+                          Analizar Sobrecarga Progresiva con IA
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Bloque 3: Sustituto Inteligente de Ejercicios */}
+                  <div className="p-4 rounded-xl border bg-neutral-900/40 border-neutral-850 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
+                        <Droplet className="w-4 h-4 text-brand-gold" />
+                        Sustituto de Ejercicios Inteligente
+                      </p>
+                      <span className="text-[8px] font-mono bg-brand-gold/10 text-brand-gold/80 px-2 py-0.5 rounded uppercase">IA de Sala</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[8px] font-mono text-neutral-400 uppercase">¿Qué máquina o ejercicio está ocupado?</label>
+                      <select
+                        value={subTargetExercise}
+                        onChange={(e) => setSubTargetExercise(e.target.value)}
+                        className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl px-3 py-2 text-white outline-none focus:border-brand-gold font-mono"
+                      >
+                        <option value="Prensa de Piernas 45° de Poder">Prensa de Piernas 45° (Ocupada)</option>
+                        <option value="Polea Alta de Jalón Dorsal">Polea Alta de Jalón Dorsal (Ocupada)</option>
+                        <option value="Aperturas en Pec Dec / Crossover">Aperturas en Pec Dec (Ocupada)</option>
+                        <option value="Jaula de Sentadilla Libre">Jaula de Sentadilla Libre (Ocupada)</option>
+                      </select>
+                    </div>
+
+                    {aiSubstitutesText && (
+                      <div className="bg-neutral-950 border border-neutral-900 p-3 rounded-xl text-xs text-neutral-300 leading-relaxed">
+                        <p className="font-semibold text-brand-gold text-[10px] uppercase font-mono mb-1">Alternativa Sugerida por la IA:</p>
+                        <p>{aiSubstitutesText}</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleGenerateSubstituteAI}
+                      disabled={aiSubstitutesLoading}
+                      className="w-full bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white py-1.5 px-3 rounded-lg text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {aiSubstitutesLoading ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          Buscando alternativas...
+                        </>
+                      ) : (
+                        <>
+                          <Info className="w-3.5 h-3.5 text-brand-gold" />
+                          Encontrar Sustituto de Ejercicio con IA
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Bloque 4: IA de Generación de Push Notifications Personalizadas */}
+                  <div className="p-4 rounded-xl border bg-neutral-900/40 border-neutral-850 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <p className="text-xs font-bold text-white uppercase flex items-center gap-1.5 font-display">
+                        <Bell className="w-4 h-4 text-brand-gold" />
+                        Generador de Notificaciones de Enganche (IA)
+                      </p>
+                      <span className="text-[8px] font-mono bg-brand-gold/10 text-brand-gold/80 px-2 py-0.5 rounded uppercase">Enganche & Fidelidad</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[8px] font-mono text-neutral-400 uppercase">Patrón de Asistencia del Socio</label>
+                      <select
+                        value={attendancePattern}
+                        onChange={(e) => setAttendancePattern(e.target.value)}
+                        className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl px-3 py-2 text-white outline-none focus:border-brand-gold font-mono"
+                      >
+                        <option value="asistió Lunes, Miércoles, Viernes de forma constante">Asistencia Constante (Lunes, Miércoles, Viernes)</option>
+                        <option value="lleva 5 días sin asistir al Dragon GYM">En riesgo de abandono (Lleva 5 días ausente)</option>
+                        <option value="ha roto su récord asistiendo 6 días seguidos">Fidelizado de alto nivel (Récord de 6 días seguidos)</option>
+                      </select>
+                    </div>
+
+                    {aiNotificationText && (
+                      <div className="bg-neutral-950 border border-neutral-900 p-3 rounded-xl text-xs text-neutral-300 leading-relaxed">
+                        <p className="font-semibold text-brand-gold text-[10px] uppercase font-mono mb-1">Notificación Push Generada:</p>
+                        <p className="italic">"✨ IA: {aiNotificationText}"</p>
+                        <p className="text-[9px] text-neutral-500 font-mono mt-1">✓ Enviada al Centro de Notificaciones del Socio</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleGeneratePushNotificationAI}
+                      disabled={aiNotificationLoading}
+                      className="w-full bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-300 hover:text-white py-1.5 px-3 rounded-lg text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {aiNotificationLoading ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          Generando push...
+                        </>
+                      ) : (
+                        <>
+                          <Bell className="w-3.5 h-3.5 text-brand-gold" />
+                          Simular Push Notification de Enganche con IA
+                        </>
+                      )}
+                    </button>
                   </div>
 
                   {/* Tabla de Historial */}

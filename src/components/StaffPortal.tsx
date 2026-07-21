@@ -28,7 +28,9 @@ import {
   ShoppingBag,
   Plus,
   Minus,
-  PackageOpen
+  PackageOpen,
+  MessageSquare,
+  BookOpen
 } from 'lucide-react';
 import { GymClass, UserProfile } from '../types';
 
@@ -51,6 +53,8 @@ interface ClientProfile {
   status: 'Activo' | 'Vencido' | 'Pendiente';
   lastCheckIn: string;
   avatarColor: string;
+  objetivo?: string;
+  comprasPrevias?: string[];
 }
 
 interface ScanLog {
@@ -89,7 +93,7 @@ export default function StaffPortal({
 }: StaffPortalProps) {
   
   // Navigation tabs (Monitor, Inscripción, POS / Caja, Pases Temporales, Lista Asistencia)
-  const [activeTab, setActiveTab] = useState<'monitor' | 'registro' | 'pos_caja' | 'pases' | 'sesiones'>('monitor');
+  const [activeTab, setActiveTab] = useState<'monitor' | 'registro' | 'pos_caja' | 'pases' | 'sesiones' | 'mensajeria'>('monitor');
 
   // =========================================================================
   // --- STATE FOR CLIENTS & MEMBERS ---
@@ -105,7 +109,9 @@ export default function StaffPortal({
       membershipLevel: user.membershipLevel,
       status: (user.membershipLevel.toLowerCase().includes('vencid') || user.membershipLevel.toLowerCase().includes('inactiv')) ? 'Vencido' : 'Activo' as 'Activo' | 'Vencido' | 'Pendiente',
       lastCheckIn: 'Hoy, 08:30 AM',
-      avatarColor: 'bg-brand-gold/20 text-brand-gold'
+      avatarColor: 'bg-brand-gold/20 text-brand-gold',
+      objetivo: 'Aumento de Fuerza y Potencia',
+      comprasPrevias: ['Proteína de Suero Aislada (comprado hace 3 semanas)', 'Toalla de Microfibra']
     };
 
     if (saved) {
@@ -122,11 +128,11 @@ export default function StaffPortal({
       }
     }
     return [
-      { id: 'DG-1090', name: 'Sarah Connor', email: 'sarah.c@sky.net', phone: '+1 (555) 109-0221', bloodType: 'A-', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 11:15 AM', avatarColor: 'bg-emerald-500/20 text-emerald-300' },
-      { id: 'DG-2281', name: 'John Connor', email: 'john.c@sky.net', phone: '+1 (555) 228-1110', bloodType: 'O+', membershipLevel: 'Plan Mensual Estándar', status: 'Vencido', lastCheckIn: 'Hace 5 días', avatarColor: 'bg-red-500/20 text-red-300' },
-      { id: 'DG-3382', name: 'Marcus Wright', email: 'marcus@projectangel.org', phone: '+1 (555) 338-2026', bloodType: 'B+', membershipLevel: 'Plan Anual Elite', status: 'Activo', lastCheckIn: 'Hoy, 10:55 AM', avatarColor: 'bg-blue-500/20 text-blue-300' },
-      { id: 'DG-4512', name: 'Kyle Reese', email: 'kyle.reese@resistance.org', phone: '+1 (555) 451-2291', bloodType: 'O-', membershipLevel: 'Plan Mensual Estándar', status: 'Pendiente', lastCheckIn: 'Hace 12 días', avatarColor: 'bg-amber-500/20 text-amber-300' },
-      { id: 'DG-5555', name: 'T-800 Cyberdyne', email: 'terminator@skynet.com', phone: '+1 (555) 800-1984', bloodType: 'Metálico', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 09:12 AM', avatarColor: 'bg-purple-500/20 text-purple-300' },
+      { id: 'DG-1090', name: 'Sarah Connor', email: 'sarah.c@sky.net', phone: '+1 (555) 109-0221', bloodType: 'A-', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 11:15 AM', avatarColor: 'bg-emerald-500/20 text-emerald-300', objetivo: 'Pérdida de grasa y definición muscular', comprasPrevias: ['Shaker Mezclador Oficial', 'Barra Energética Pro-Nutritiva Dragon'] },
+      { id: 'DG-2281', name: 'John Connor', email: 'john.c@sky.net', phone: '+1 (555) 228-1110', bloodType: 'O+', membershipLevel: 'Plan Mensual Estándar', status: 'Vencido', lastCheckIn: 'Hace 5 días', avatarColor: 'bg-red-500/20 text-red-300', objetivo: 'Hipertrofia muscular general', comprasPrevias: ['Suplemento Proteína de Suero Aislada (1kg) (comprado hace 4 semanas)'] },
+      { id: 'DG-3382', name: 'Marcus Wright', email: 'marcus@projectangel.org', phone: '+1 (555) 338-2026', bloodType: 'B+', membershipLevel: 'Plan Anual Elite', status: 'Activo', lastCheckIn: 'Hoy, 10:55 AM', avatarColor: 'bg-blue-500/20 text-blue-300', objetivo: 'Recondicionamiento físico general', comprasPrevias: ['Bebida de Electrólitos Hidratantes Oficial'] },
+      { id: 'DG-4512', name: 'Kyle Reese', email: 'kyle.reese@resistance.org', phone: '+1 (555) 451-2291', bloodType: 'O-', membershipLevel: 'Plan Mensual Estándar', status: 'Pendiente', lastCheckIn: 'Hace 12 días', avatarColor: 'bg-amber-500/20 text-amber-300', objetivo: 'Aumento de Fuerza y Potencia', comprasPrevias: ['Scoop de Pre-Entreno Dragon Punch'] },
+      { id: 'DG-5555', name: 'T-800 Cyberdyne', email: 'terminator@skynet.com', phone: '+1 (555) 800-1984', bloodType: 'Metálico', membershipLevel: 'VIP Dragon Pass', status: 'Activo', lastCheckIn: 'Hoy, 09:12 AM', avatarColor: 'bg-purple-500/20 text-purple-300', objetivo: 'Fuerza extrema y potencia bruta', comprasPrevias: ['Suplemento Proteína de Suero Aislada (1kg) (comprado hace 2 semanas)'] },
       userAsClient
     ];
   });
@@ -266,6 +272,137 @@ export default function StaffPortal({
   const [selectedClient, setSelectedClient] = useState<ClientProfile | null>(null);
   const [selectedMembershipToBuy, setSelectedMembershipToBuy] = useState<'Mensual' | 'Anual' | 'VIP'>('Mensual');
   const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Terminal'>('Terminal');
+
+  // --- ESTADOS Y MANEJADORES PARA IA DE RECOMENDACIÓN EN VENTAS (CROSS-SELLING) ---
+  const [aiRecLoading, setAiRecLoading] = useState(false);
+  const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
+
+  const fetchSupplementRecommendation = async (client: ClientProfile) => {
+    setAiRecLoading(true);
+    setAiRecommendation(null);
+    try {
+      const response = await fetch("/api/gemini/sugerir-suplementos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: client.name,
+          objective: client.objetivo || "Hipertrofia muscular general",
+          previousPurchases: client.comprasPrevias || []
+        })
+      });
+      const data = await response.json();
+      if (data.recommendation) {
+        setAiRecommendation(data.recommendation);
+      } else {
+        setAiRecommendation("Sugerencia: Recomendar Creatina Monohidratada para acelerar su objetivo.");
+      }
+    } catch (err) {
+      console.error(err);
+      setAiRecommendation("Sugerencia: Recomendar Creatina Monohidratada para acelerar su objetivo.");
+    } finally {
+      setAiRecLoading(false);
+    }
+  };
+
+  // --- ESTADOS Y TIPOS PARA EL ASISTENTE DE PREGUNTAS FRECUENTES (CHAT DE CONSULTAS) ---
+  interface ChatQuery {
+    id: string;
+    clientName: string;
+    clientId: string;
+    membershipLevel: string;
+    avatarColor: string;
+    queryText: string;
+    time: string;
+    status: 'pending' | 'answered';
+    answerText?: string;
+    aiDraft?: string;
+  }
+
+  const [chatConversations, setChatConversations] = useState<ChatQuery[]>([
+    {
+      id: 'Q-901',
+      clientName: 'Sarah Connor',
+      clientId: 'DG-1090',
+      membershipLevel: 'VIP Dragon Pass',
+      avatarColor: 'bg-emerald-500/20 text-emerald-300',
+      queryText: 'Hola, disculpa, ¿puedo congelar mi membresía VIP por 2 semanas? Voy a salir de viaje de negocios.',
+      time: 'Hace 5 min',
+      status: 'pending'
+    },
+    {
+      id: 'Q-902',
+      clientName: 'Kyle Reese',
+      clientId: 'DG-4512',
+      membershipLevel: 'Plan Mensual Estándar',
+      avatarColor: 'bg-amber-500/20 text-amber-300',
+      queryText: 'Disculpa, ¿las toallas de baño están incluidas en mi plan o tengo que pagar extra por cada uso?',
+      time: 'Hace 12 min',
+      status: 'pending'
+    },
+    {
+      id: 'Q-903',
+      clientName: 'John Connor',
+      clientId: 'DG-2281',
+      membershipLevel: 'Plan Mensual Estándar',
+      avatarColor: 'bg-red-500/20 text-red-300',
+      queryText: 'Hola, ¿cuál es el horario de atención en la recepción los domingos? Quiero pasar por mi credencial física.',
+      time: 'Ayer',
+      status: 'answered',
+      answerText: 'Hola John! El horario de recepción los domingos es de 08:00 AM a 02:00 PM. Te esperamos para entregarte tu credencial.'
+    }
+  ]);
+
+  const [selectedChat, setSelectedChat] = useState<ChatQuery | null>(null);
+  const [draftLoading, setDraftLoading] = useState(false);
+  const [typedAnswer, setTypedAnswer] = useState('');
+
+  const handleGenerateAiDraft = async (query: ChatQuery) => {
+    setDraftLoading(true);
+    try {
+      const response = await fetch("/api/gemini/redactar-respuesta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: query.clientName,
+          queryText: query.queryText,
+          membershipLevel: query.membershipLevel
+        })
+      });
+      const data = await response.json();
+      if (data.draft) {
+        setTypedAnswer(data.draft);
+        setChatConversations(prev => prev.map(q => q.id === query.id ? { ...q, aiDraft: data.draft } : q));
+        onTriggerNotification("✨ Borrador con IA redactado con éxito. Valida y edítalo antes de enviar.");
+      }
+    } catch (err) {
+      console.error(err);
+      onTriggerNotification("❌ Error al conectar con el Asistente de Preguntas Frecuentes.");
+    } finally {
+      setDraftLoading(false);
+    }
+  };
+
+  const handleSendAnswer = (queryId: string) => {
+    if (!typedAnswer.trim()) {
+      onTriggerNotification("⚠️ Escribe una respuesta o genera un borrador primero.");
+      return;
+    }
+    setChatConversations(prev => prev.map(q => {
+      if (q.id === queryId) {
+        return {
+          ...q,
+          status: 'answered',
+          answerText: typedAnswer,
+          aiDraft: undefined
+        };
+      }
+      return q;
+    }));
+    onTriggerNotification(`📨 Respuesta enviada con éxito a ${selectedChat?.clientName || 'Atleta'}.`);
+    setTypedAnswer('');
+    setSelectedChat(null);
+  };
+
   const [shiftSalesCash, setShiftSalesCash] = useState(240);
   const [shiftSalesTerminal, setShiftSalesTerminal] = useState(580);
   const [salesHistory, setSalesHistory] = useState<Array<{ id: string; name: string; amount: number; method: string; date: string }>>([
@@ -288,6 +425,24 @@ export default function StaffPortal({
 
   // Pedidos realizados por los socios desde la app
   const [pendingOrders, setPendingOrders] = useState<Array<{ id: string; clientName: string; clientId: string; productName: string; price: number; date: string; status: string }>>([]);
+
+  // Auto-fetch supplement cross-selling recommendation when selectedClient or cartSocioId changes
+  useEffect(() => {
+    if (activeTab === 'pos_caja') {
+      if (posSubTab === 'membresias' && selectedClient) {
+        fetchSupplementRecommendation(selectedClient);
+      } else if (posSubTab === 'tienda' && cartSocioId && cartSocioId !== 'publico') {
+        const clientObj = clients.find(c => c.id === cartSocioId);
+        if (clientObj) {
+          fetchSupplementRecommendation(clientObj);
+        } else {
+          setAiRecommendation(null);
+        }
+      } else {
+        setAiRecommendation(null);
+      }
+    }
+  }, [selectedClient, cartSocioId, posSubTab, activeTab, clients]);
 
   const shopProductsList = [
     { id: 'p1', name: 'Suplemento Proteína de Suero Aislada (1kg)', price: 39, category: 'Suplementos' },
@@ -606,6 +761,15 @@ export default function StaffPortal({
           >
             <Users className="w-3.5 h-3.5" />
             Asistencia
+          </button>
+          <button
+            onClick={() => setActiveTab('mensajeria')}
+            className={`py-1.5 px-3.5 text-[11px] font-mono uppercase font-bold rounded-lg transition flex items-center gap-1.5 ${
+              activeTab === 'mensajeria' ? 'bg-emerald-400 text-black' : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            Consultas IA
           </button>
         </div>
 
@@ -1124,6 +1288,40 @@ export default function StaffPortal({
                           <p className="text-[10px] text-neutral-400 mt-0.5">ID: {selectedClient.id} • {selectedClient.phone}</p>
                         </div>
 
+                        {/* WIDGET RECOMENDADOR CON IA (CROSS-SELLING) */}
+                        <div className="p-3.5 rounded-xl border bg-brand-gold/5 border-brand-gold/20 space-y-2 text-left relative overflow-hidden">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[9px] font-bold text-white uppercase flex items-center gap-1 font-display">
+                              <Sparkles className="w-3.5 h-3.5 text-brand-gold animate-pulse" />
+                              Cross-selling Sugerido por IA
+                            </span>
+                            <span className="text-[7px] font-mono bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                              Dragon Suplementos
+                            </span>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[8px] font-mono text-neutral-500">
+                              <span>Objetivo: {selectedClient.objetivo || "Hipertrofia muscular general"}</span>
+                            </div>
+                            
+                            {aiRecLoading ? (
+                              <div className="flex items-center gap-2 py-1 text-[10px] text-neutral-400 font-mono">
+                                <RefreshCw className="w-3 h-3 animate-spin text-brand-gold" />
+                                <span>Analizando patrón y objetivos...</span>
+                              </div>
+                            ) : aiRecommendation ? (
+                              <p className="text-[11px] text-brand-gold font-medium leading-relaxed font-sans pt-0.5">
+                                "{aiRecommendation}"
+                              </p>
+                            ) : (
+                              <p className="text-[10px] text-neutral-500 font-light">
+                                No hay recomendación cargada.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
                         <div className="space-y-2">
                           <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Seleccionar Renovación / Producto</label>
                           <div className="grid grid-cols-3 gap-2">
@@ -1359,6 +1557,29 @@ export default function StaffPortal({
                           ))}
                         </select>
                       </div>
+
+                      {/* AI CROSS-SELLING FOR SHOP */}
+                      {cartSocioId !== 'publico' && (
+                        <div className="p-3 py-2.5 rounded-xl border bg-brand-gold/5 border-brand-gold/20 space-y-1.5 text-left">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[9px] font-bold text-white uppercase flex items-center gap-1 font-display">
+                              <Sparkles className="w-3.5 h-3.5 text-brand-gold animate-pulse" />
+                              Recomendación Cruzada (IA)
+                            </span>
+                            <span className="text-[7px] font-mono bg-brand-gold/10 text-brand-gold px-1.5 py-0.5 rounded uppercase">Dragon Sugiere</span>
+                          </div>
+                          {aiRecLoading ? (
+                            <div className="flex items-center gap-2 text-[10px] text-neutral-400 font-mono py-0.5">
+                              <RefreshCw className="w-3 h-3 animate-spin text-brand-gold" />
+                              <span>Calculando oferta ideal...</span>
+                            </div>
+                          ) : aiRecommendation ? (
+                            <p className="text-[10px] text-brand-gold leading-normal font-sans">
+                              "{aiRecommendation}"
+                            </p>
+                          ) : null}
+                        </div>
+                      )}
 
                       {/* Cart Items List */}
                       <div className="bg-black/40 border border-neutral-900 rounded-xl p-3.5 space-y-3 min-h-[120px] max-h-[200px] overflow-y-auto no-scrollbar">
@@ -1708,6 +1929,236 @@ export default function StaffPortal({
           </motion.div>
         )}
 
+        {/* =========================================================================
+            TAB 6: CHAT DE CONSULTAS & ASISTENTE FAQ IA
+            ========================================================================= */}
+        {activeTab === 'mensajeria' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6 max-w-5xl mx-auto text-left"
+          >
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-neutral-900">
+              <div>
+                <h2 className="text-lg font-display font-black tracking-wider text-white">Buzón de Consultas & Chat</h2>
+                <p className="text-[11px] font-mono text-emerald-400">RECEPCIÓN INTELIGENTE DRAGON • ASISTENCIA AUTOMÁTICA FAQ IA</p>
+              </div>
+              <div className="flex items-center gap-2 bg-neutral-900/40 p-2 rounded-xl border border-neutral-850/60">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-mono text-neutral-400">Canal de Chat Online</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left column: List of member inquiries */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-4 space-y-3">
+                  <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Consultas Recibidas</span>
+                  
+                  <div className="space-y-2 max-h-[480px] overflow-y-auto no-scrollbar">
+                    {chatConversations.map((chat) => {
+                      const isSelected = selectedChat?.id === chat.id;
+                      return (
+                        <button
+                          key={chat.id}
+                          onClick={() => {
+                            setSelectedChat(chat);
+                            setTypedAnswer(chat.aiDraft || chat.answerText || '');
+                          }}
+                          className={`w-full p-3.5 rounded-xl border text-left transition duration-200 flex flex-col gap-2.5 ${
+                            isSelected 
+                              ? 'border-brand-gold bg-brand-gold/5' 
+                              : chat.status === 'pending'
+                                ? 'border-neutral-900 bg-neutral-950 hover:border-neutral-800'
+                                : 'border-neutral-900/40 bg-neutral-950/40 opacity-70 hover:opacity-100 hover:border-neutral-800'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${chat.avatarColor}`}>
+                                {chat.clientName.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-bold text-white leading-tight">{chat.clientName}</h4>
+                                <span className="text-[9px] font-mono text-neutral-500">{chat.membershipLevel}</span>
+                              </div>
+                            </div>
+                            <span className="text-[9px] font-mono text-neutral-500">{chat.time}</span>
+                          </div>
+
+                          <p className="text-[11px] text-neutral-300 line-clamp-2 font-sans pl-1">
+                            "{chat.queryText}"
+                          </p>
+
+                          <div className="flex justify-between items-center pt-1 border-t border-neutral-900/60 text-[9px] font-mono">
+                            <span className="text-neutral-500">ID: {chat.clientId}</span>
+                            {chat.status === 'pending' ? (
+                              <span className="text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded uppercase">Pendiente</span>
+                            ) : (
+                              <span className="text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded uppercase flex items-center gap-1">
+                                Respondido ✓
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Gym FAQ Reference Cheat Sheet widget */}
+                <div className="bg-neutral-900/15 border border-neutral-900 rounded-2xl p-4 space-y-3.5">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-neutral-400" />
+                    <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest font-bold">Lineamientos del Club (FAQ)</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-neutral-500">
+                    <div className="p-2 bg-neutral-950/50 border border-neutral-900/50 rounded-xl space-y-1">
+                      <span className="text-neutral-400 text-[9px] font-bold uppercase block text-brand-gold">Toallas Premium</span>
+                      <p className="text-[9px] leading-relaxed">Incluidas únicamente en VIP Dragon Pass. En otros planes: $2 USD de renta.</p>
+                    </div>
+                    <div className="p-2 bg-neutral-950/50 border border-neutral-900/50 rounded-xl space-y-1">
+                      <span className="text-neutral-400 text-[9px] font-bold uppercase block text-brand-gold">Congelación</span>
+                      <p className="text-[9px] leading-relaxed">VIP: hasta 30 días/año. Anual Elite: hasta 15 días/año. Estándar: No aplica.</p>
+                    </div>
+                    <div className="p-2 bg-neutral-950/50 border border-neutral-900/50 rounded-xl space-y-1">
+                      <span className="text-neutral-400 text-[9px] font-bold uppercase block text-brand-gold">Estacionamiento</span>
+                      <p className="text-[9px] leading-relaxed">Subterráneo de cortesía por 2 horas gratis validando código QR en mostrador.</p>
+                    </div>
+                    <div className="p-2 bg-neutral-950/50 border border-neutral-900/50 rounded-xl space-y-1">
+                      <span className="text-neutral-400 text-[9px] font-bold uppercase block text-brand-gold">Horarios</span>
+                      <p className="text-[9px] leading-relaxed">L-V: 06:00-22:00. Sáb: 07:00-18:00. Dom: 08:00-14:00.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right column: Active workspace & AI drafting engine */}
+              <div className="lg:col-span-7">
+                {selectedChat ? (
+                  <div className="bg-neutral-900/20 border border-neutral-900 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-neutral-900 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${selectedChat.avatarColor}`}>
+                          {selectedChat.clientName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="text-xs font-bold text-white">{selectedChat.clientName}</h3>
+                          <span className="text-[9px] font-mono text-neutral-400">{selectedChat.membershipLevel} • ID: {selectedChat.clientId}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedChat(null)}
+                        className="p-1.5 hover:bg-neutral-900 rounded text-neutral-400 hover:text-white transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Chat Bubble Area */}
+                    <div className="space-y-4 py-2">
+                      <div className="flex gap-2.5 max-w-[85%] text-left">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold ${selectedChat.avatarColor}`}>
+                          {selectedChat.clientName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="bg-neutral-900 rounded-2xl rounded-tl-none p-3.5 border border-neutral-850">
+                          <p className="text-[12px] text-neutral-200 leading-relaxed font-sans">
+                            {selectedChat.queryText}
+                          </p>
+                          <span className="text-[8px] font-mono text-neutral-500 block text-right mt-1.5">{selectedChat.time}</span>
+                        </div>
+                      </div>
+
+                      {selectedChat.status === 'answered' && (
+                        <div className="flex gap-2.5 max-w-[85%] ml-auto flex-row-reverse text-right">
+                          <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400 shrink-0 border border-emerald-500/30 flex items-center justify-center text-[10px] font-bold">
+                            R
+                          </div>
+                          <div className="bg-emerald-950/10 border border-emerald-500/10 rounded-2xl rounded-tr-none p-3.5 text-left">
+                            <p className="text-[12px] text-emerald-300 leading-relaxed font-sans">
+                              {selectedChat.answerText}
+                            </p>
+                            <span className="text-[8px] font-mono text-emerald-600 block text-right mt-1.5 font-bold">Enviado ✓</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* AI Drafting actions & Text Editor */}
+                    {selectedChat.status === 'pending' && (
+                      <div className="space-y-4 pt-3 border-t border-neutral-900">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                          <div className="space-y-0.5">
+                            <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block">Responder con Inteligencia Artificial</span>
+                            <p className="text-[10px] text-neutral-400">Genera un borrador entrenado con las reglas oficiales.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleGenerateAiDraft(selectedChat)}
+                            disabled={draftLoading}
+                            className="bg-brand-gold hover:bg-brand-gold/80 disabled:opacity-50 text-black px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 transition duration-200"
+                          >
+                            {draftLoading ? (
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Sparkles className="w-3.5 h-3.5" />
+                            )}
+                            Borrador con IA
+                          </button>
+                        </div>
+
+                        {selectedChat.aiDraft && (
+                          <div className="p-3.5 bg-brand-gold/5 border border-brand-gold/20 rounded-xl space-y-1">
+                            <div className="flex justify-between items-center pb-1.5 border-b border-brand-gold/15">
+                              <span className="text-[9px] font-bold text-brand-gold uppercase flex items-center gap-1 font-mono">
+                                <Sparkles className="w-3.5 h-3.5" />
+                                Borrador Sugerido
+                              </span>
+                              <span className="text-[7px] font-mono bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded uppercase font-bold">Autocompletado con IA</span>
+                            </div>
+                            <p className="text-[11px] text-neutral-300 leading-relaxed font-sans pt-1">
+                              "{selectedChat.aiDraft}"
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">Buzón de Redacción (Staff)</label>
+                          <textarea
+                            rows={3}
+                            value={typedAnswer}
+                            onChange={(e) => setTypedAnswer(e.target.value)}
+                            placeholder="Escribe la respuesta aquí o haz clic en 'Borrador con IA' para autocompletar..."
+                            className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl p-3 text-white outline-none focus:border-emerald-400 transition"
+                          />
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSendAnswer(selectedChat.id)}
+                            className="flex-1 bg-emerald-400 hover:bg-emerald-350 text-black py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition text-center"
+                          >
+                            Enviar Respuesta (1-click)
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-neutral-900/10 border border-neutral-900/60 border-dashed rounded-2xl p-12 text-center space-y-3">
+                    <MessageSquare className="w-10 h-10 mx-auto text-neutral-700 animate-pulse" />
+                    <div>
+                      <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">Buzón de Atención Inactivo</h4>
+                      <p className="text-[10px] text-neutral-500 mt-1">Selecciona una consulta de socio de la lista de la izquierda para comenzar.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
       </div>
 
       {/* FOOTER */}
@@ -1766,6 +2217,16 @@ export default function StaffPortal({
         >
           <Users className="w-5 h-5" />
           <span className="text-[8px] font-mono font-bold uppercase tracking-wider">Asistencia</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('mensajeria')}
+          className={`flex flex-col items-center gap-1 transition ${
+            activeTab === 'mensajeria' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-400'
+          }`}
+        >
+          <MessageSquare className="w-5 h-5" />
+          <span className="text-[8px] font-mono font-bold uppercase tracking-wider">Consultas IA</span>
         </button>
       </div>
     </div>
