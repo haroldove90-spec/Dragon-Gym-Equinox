@@ -28,9 +28,9 @@ export default function AdminPlanes({ onAddAuditLog }: AdminPlanesProps) {
       }
     }
     const defaults: MembershipPlan[] = [
-      { id: 'plan-1', name: 'Plan Mensual Estándar', price: 59, period: 'Mensual', vigencia: '30 días', benefits: ['Acceso ilimitado a máquinas', 'Locker gratuito', '1 clase grupal por semana'] },
-      { id: 'plan-2', name: 'Plan Anual Elite', price: 499, period: 'Anual', vigencia: '365 días', benefits: ['Acceso multi-sucursal', 'Eucalyptus towels', 'Clases grupales ilimitadas', '1 sesión con coach'] },
-      { id: 'plan-3', name: 'VIP Dragon Pass', price: 120, period: 'VIP', vigencia: 'Mensual recurrente', benefits: ['Acceso total prioritario', 'Zona de spa & sauna', 'Clases premium exclusivas', 'Bebidas de cortesía ilimitadas'] }
+      { id: 'plan-1', name: 'Plan Mensual Estándar', price: 59, period: 'Mensual', vigencia: '30 días', benefits: ['Acceso ilimitado a máquinas', 'Locker gratuito', '1 entrenamiento grupal por semana'] },
+      { id: 'plan-2', name: 'Plan Anual Elite', price: 499, period: 'Anual', vigencia: '365 días', benefits: ['Acceso multi-sucursal', 'Toallas de eucalipto', 'Entrenamientos grupales ilimitados', '1 sesión con coach'] },
+      { id: 'plan-3', name: 'VIP Dragon Pass', price: 120, period: 'VIP', vigencia: 'Mensual recurrente', benefits: ['Acceso total prioritario', 'Zona de spa & sauna', 'Entrenamientos premium exclusivos', 'Bebidas de cortesía ilimitadas'] }
     ];
     localStorage.setItem('eqx_plans', JSON.stringify(defaults));
     return defaults;

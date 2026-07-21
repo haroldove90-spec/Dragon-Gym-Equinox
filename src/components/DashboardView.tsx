@@ -12,6 +12,7 @@ interface DashboardViewProps {
   onOpenAdminPortal: () => void;
   onOpenStaffPortal: () => void;
   onOpenSocioPortal: () => void;
+  onOpenCoachPortal: () => void;
 }
 
 export default function DashboardView({
@@ -22,7 +23,8 @@ export default function DashboardView({
   onOpenArticle,
   onOpenAdminPortal,
   onOpenStaffPortal,
-  onOpenSocioPortal
+  onOpenSocioPortal,
+  onOpenCoachPortal
 }: DashboardViewProps) {
   
   const shopArticle = articles.find(a => a.category === 'SHOP');
@@ -56,7 +58,7 @@ export default function DashboardView({
           onClick={onNavigateToExplore}
           className="px-3.5 py-1.5 rounded-full border border-neutral-800 text-xs font-semibold hover:bg-neutral-900 transition"
         >
-          Book Class
+          Explorar
         </button>
       </div>
 
@@ -64,7 +66,7 @@ export default function DashboardView({
       <div className="pb-8 space-y-4 shrink-0 mt-6">
         <div className="flex items-center justify-between border-b border-neutral-900 pb-2">
           <h3 className="text-[10px] font-mono tracking-widest text-brand-gold uppercase font-bold">PORTALES DE ACCESO POR ROL</h3>
-          <span className="text-[9px] font-mono text-neutral-500 uppercase">Interactive Suite</span>
+          <span className="text-[9px] font-mono text-neutral-500 uppercase">Suite Interactiva</span>
         </div>
         
         <div className="grid grid-cols-1 gap-3.5">
@@ -76,7 +78,7 @@ export default function DashboardView({
           >
             <img
               src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop"
-              alt="Admin Portal"
+              alt="Portal Administrador"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover filter brightness-[0.4] group-hover:scale-[1.01] transition duration-500"
             />
@@ -86,7 +88,7 @@ export default function DashboardView({
                 PORTAL ADMINISTRADOR
               </span>
               <span className="text-[9px] font-mono tracking-wider text-neutral-400 mt-1 uppercase opacity-80 group-hover:opacity-100 transition">
-                Analytics & Schedule Manager
+                Métricas y Gestión de Horarios
               </span>
             </div>
           </div>
@@ -99,7 +101,7 @@ export default function DashboardView({
           >
             <img
               src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop"
-              alt="Staff Portal"
+              alt="Portal Staff"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover filter brightness-[0.4] group-hover:scale-[1.01] transition duration-500"
             />
@@ -109,7 +111,7 @@ export default function DashboardView({
                 PORTAL STAFF
               </span>
               <span className="text-[9px] font-mono tracking-wider text-neutral-400 mt-1 uppercase opacity-80 group-hover:opacity-100 transition">
-                Barcode Check-In & Attendance
+                Registro de Entrada y Asistencia
               </span>
             </div>
           </div>
@@ -122,7 +124,7 @@ export default function DashboardView({
           >
             <img
               src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"
-              alt="Socio Portal"
+              alt="Portal Socio"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover filter brightness-[0.4] group-hover:scale-[1.01] transition duration-500"
             />
@@ -132,7 +134,30 @@ export default function DashboardView({
                 PORTAL SOCIO
               </span>
               <span className="text-[9px] font-mono tracking-wider text-neutral-400 mt-1 uppercase opacity-80 group-hover:opacity-100 transition">
-                Athlete Profile, Bookings & Fitness Goals
+                Perfil de Atleta, Pagos y Objetivos
+              </span>
+            </div>
+          </div>
+
+          {/* Coach / Entrenador Card */}
+          <div
+            onClick={onOpenCoachPortal}
+            id="role-btn-coach"
+            className="group cursor-pointer relative h-[105px] rounded-2xl overflow-hidden border border-neutral-900/80 hover:border-brand-gold/30 transition duration-300 shadow-md"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=600&auto=format&fit=crop"
+              alt="Portal Entrenador / Coach"
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover filter brightness-[0.4] group-hover:scale-[1.01] transition duration-500"
+            />
+            <div className="absolute inset-0 bg-neutral-950/25 group-hover:bg-neutral-950/15 transition" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+              <span className="text-sm md:text-base font-display font-black tracking-[0.3em] text-white uppercase group-hover:text-brand-gold transition duration-300">
+                PORTAL ENTRENADOR / COACH
+              </span>
+              <span className="text-[9px] font-mono tracking-wider text-neutral-400 mt-1 uppercase opacity-80 group-hover:opacity-100 transition">
+                Seguimiento Técnico y Ajuste de Rutinas
               </span>
             </div>
           </div>

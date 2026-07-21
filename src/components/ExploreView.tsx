@@ -24,10 +24,10 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
     
     if (activeCategory) {
       // Simple tag checks
-      if (activeCategory === 'In-Club Classes' && cls.isEquinoxExclusive) return matchesSearch;
-      if (activeCategory === 'On-Demand Classes' && !cls.isEquinoxExclusive) return matchesSearch;
-      if (activeCategory === 'Studio Pilates' && cls.category === 'Pilates') return matchesSearch;
-      if (activeCategory === 'Movement Library' && (cls.category === 'Strength' || cls.category === 'Yoga')) return matchesSearch;
+      if (activeCategory === 'Clases en el Club' && cls.isEquinoxExclusive) return matchesSearch;
+      if (activeCategory === 'Clases On-Demand' && !cls.isEquinoxExclusive) return matchesSearch;
+      if (activeCategory === 'Estudio de Pilates' && cls.category === 'Pilates') return matchesSearch;
+      if (activeCategory === 'Biblioteca de Movimientos' && (cls.category === 'Strength' || cls.category === 'Funcional')) return matchesSearch;
     }
     return matchesSearch;
   });
@@ -36,7 +36,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
     <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar font-sans px-5 pb-24">
       {/* Title Header */}
       <div className="flex items-center justify-between py-4 shrink-0">
-        <h2 className="text-3xl font-display font-semibold tracking-tight text-white">Explore</h2>
+        <h2 className="text-3xl font-display font-semibold tracking-tight text-white">Explorar</h2>
         <div className="relative">
           <Search className="w-5 h-5 text-neutral-400" />
         </div>
@@ -50,7 +50,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search classes, coaches, programs..."
+            placeholder="Buscar entrenamientos, entrenadores, programas..."
             className="bg-transparent border-none outline-none text-xs text-white placeholder-neutral-500 w-full"
           />
           {searchQuery && (
@@ -58,7 +58,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
               onClick={() => setSearchQuery('')}
               className="text-[10px] uppercase font-mono text-neutral-500 hover:text-white"
             >
-              Clear
+              Limpiar
             </button>
           )}
         </div>
@@ -67,12 +67,12 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
       {/* Filter Category Header (if active) */}
       {activeCategory && (
         <div className="flex items-center justify-between bg-neutral-900/30 border border-neutral-900 p-3 rounded-xl mb-4 shrink-0">
-          <span className="text-xs text-brand-gold font-medium">Viewing {activeCategory}</span>
+          <span className="text-xs text-brand-gold font-medium">Viendo {activeCategory}</span>
           <button
             onClick={() => setActiveCategory(null)}
             className="text-[10px] font-mono text-neutral-400 hover:text-white uppercase tracking-wider underline decoration-brand-gold decoration-2"
           >
-            Show All Grid
+            Mostrar Todo
           </button>
         </div>
       )}
@@ -105,7 +105,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
         /* Filtered List of Classes */
         <div className="space-y-3 shrink-0 mb-6">
           <h3 className="text-[10px] font-mono tracking-widest text-neutral-500 uppercase">
-            {filteredClasses.length} Match{filteredClasses.length !== 1 ? 'es' : ''} Found
+            Se encontraron {filteredClasses.length} coincidencia{filteredClasses.length !== 1 ? 's' : ''}
           </h3>
           
           {filteredClasses.length > 0 ? (
@@ -129,14 +129,14 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
                   </div>
                   <div className="flex flex-col items-end shrink-0 text-right">
                     <span className="text-xs font-mono font-bold text-white bg-neutral-950 px-2 py-0.5 rounded">{cls.time}</span>
-                    {cls.booked && <span className="text-[8px] uppercase tracking-wider text-emerald-400 mt-1">Booked</span>}
+                    {cls.booked && <span className="text-[8px] uppercase tracking-wider text-emerald-400 mt-1">Reservado</span>}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="py-8 text-center text-xs text-neutral-500 bg-neutral-900/20 border border-neutral-900 rounded-xl">
-              No matching club sessions found. Try another search.
+              No se encontraron entrenamientos de club correspondientes. Intenta otra búsqueda.
             </div>
           )}
         </div>
@@ -144,7 +144,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
 
       {/* FEATURED CONTENT SHELF (Screenshot 2 style bottom section) */}
       <div className="space-y-4 shrink-0">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400">Featured content</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400">Contenido destacado</h3>
         
         {/* Horizontal scroll shelf of classes */}
         <div className="flex gap-4 overflow-x-auto no-scrollbar py-1">
@@ -163,7 +163,7 @@ export default function ExploreView({ classes, articles, onOpenClass, onOpenArti
                 />
                 {cls.booked && (
                   <span className="absolute top-2 right-2 text-[8px] uppercase tracking-wider font-mono font-bold bg-emerald-500/90 text-white px-2 py-0.5 rounded-full">
-                    Booked
+                    Reservado
                   </span>
                 )}
                 {cls.isEquinoxExclusive && (

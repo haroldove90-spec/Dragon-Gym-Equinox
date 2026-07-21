@@ -83,7 +83,7 @@ export default function StaffPortal({
 }: StaffPortalProps) {
   
   // Navigation tabs (Monitor, Inscripción, POS / Caja, Pases Temporales, Lista Asistencia)
-  const [activeTab, setActiveTab] = useState<'monitor' | 'registro' | 'pos_caja' | 'pases' | 'clases'>('monitor');
+  const [activeTab, setActiveTab] = useState<'monitor' | 'registro' | 'pos_caja' | 'pases' | 'sesiones'>('monitor');
 
   // =========================================================================
   // --- STATE FOR CLIENTS & MEMBERS ---
@@ -417,9 +417,9 @@ export default function StaffPortal({
             Pases QR
           </button>
           <button
-            onClick={() => setActiveTab('clases')}
+            onClick={() => setActiveTab('sesiones')}
             className={`py-1.5 px-3.5 text-[11px] font-mono uppercase font-bold rounded-lg transition flex items-center gap-1.5 ${
-              activeTab === 'clases' ? 'bg-emerald-400 text-black' : 'text-neutral-400 hover:text-white'
+              activeTab === 'sesiones' ? 'bg-emerald-400 text-black' : 'text-neutral-400 hover:text-white'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -1046,9 +1046,9 @@ export default function StaffPortal({
         )}
 
         {/* =========================================================================
-            TAB 5: CONTROL DE ASISTENCIA A CLASES
+            TAB 5: CONTROL DE ASISTENCIA A SESIONES
             ========================================================================= */}
-        {activeTab === 'clases' && (
+        {activeTab === 'sesiones' && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1057,7 +1057,7 @@ export default function StaffPortal({
             {/* Active daily class selector */}
             <div className="space-y-2">
               <label className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 block font-bold">
-                Sesión Grupal del Día
+                Sesión del Día
               </label>
               <select
                 value={selectedClassId}
@@ -1183,9 +1183,9 @@ export default function StaffPortal({
         </button>
 
         <button
-          onClick={() => setActiveTab('clases')}
+          onClick={() => setActiveTab('sesiones')}
           className={`flex flex-col items-center gap-1 transition ${
-            activeTab === 'clases' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-400'
+            activeTab === 'sesiones' ? 'text-emerald-400' : 'text-neutral-500 hover:text-neutral-400'
           }`}
         >
           <Users className="w-5 h-5" />

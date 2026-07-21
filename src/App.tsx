@@ -22,6 +22,7 @@ import CheckInCard from './components/CheckInCard';
 import AdminPortal from './components/AdminPortal';
 import StaffPortal from './components/StaffPortal';
 import SocioPortal from './components/SocioPortal';
+import CoachPortal from './components/CoachPortal';
 
 import { GymClass, Program, ProgramSession, Article, UserProfile } from './types';
 import { mockUserProfile, mockClasses, mockPrograms, mockArticles } from './data';
@@ -52,6 +53,7 @@ export default function App() {
   const [showAdminPortal, setShowAdminPortal] = useState(false);
   const [showStaffPortal, setShowStaffPortal] = useState(false);
   const [showSocioPortal, setShowSocioPortal] = useState(false);
+  const [showCoachPortal, setShowCoachPortal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const triggerNotification = (message: string) => {
@@ -160,7 +162,7 @@ export default function App() {
                 activeTab === 'dashboard' ? 'text-white' : ''
               }`}
             >
-              Home
+              Inicio
               {activeTab === 'dashboard' && (
                 <motion.span layoutId="activeHeaderTab" className="absolute bottom-[-2px] inset-x-0 h-[1.5px] bg-brand-gold rounded-full" />
               )}
@@ -171,7 +173,7 @@ export default function App() {
                 activeTab === 'explore' ? 'text-white' : ''
               }`}
             >
-              Explore
+              Explorar
               {activeTab === 'explore' && (
                 <motion.span layoutId="activeHeaderTab" className="absolute bottom-[-2px] inset-x-0 h-[1.5px] bg-brand-gold rounded-full" />
               )}
@@ -182,7 +184,7 @@ export default function App() {
                 activeTab === 'programs' ? 'text-white' : ''
               }`}
             >
-              Programs
+              Programas
               {activeTab === 'programs' && (
                 <motion.span layoutId="activeHeaderTab" className="absolute bottom-[-2px] inset-x-0 h-[1.5px] bg-brand-gold rounded-full" />
               )}
@@ -193,7 +195,7 @@ export default function App() {
                 activeTab === 'profile' ? 'text-white' : ''
               }`}
             >
-              Profile
+              Mi Cuenta
               {activeTab === 'profile' && (
                 <motion.span layoutId="activeHeaderTab" className="absolute bottom-[-2px] inset-x-0 h-[1.5px] bg-brand-gold rounded-full" />
               )}
@@ -248,6 +250,10 @@ export default function App() {
                   setShowSocioPortal(true);
                   triggerNotification("Portal Socio: Bienvenido de vuelta al club.");
                 }}
+                onOpenCoachPortal={() => {
+                  setShowCoachPortal(true);
+                  triggerNotification("Portal Coach: Bienvenido, Coach.");
+                }}
               />
             </motion.div>
           )}
@@ -295,9 +301,9 @@ export default function App() {
             >
               {/* Profile Header */}
               <div className="py-4 border-b border-neutral-900 flex items-center justify-between">
-                <h2 className="text-xl font-display font-bold tracking-tight text-white">Your Account</h2>
+                <h2 className="text-xl font-display font-bold tracking-tight text-white">Tu Cuenta</h2>
                 <span className="text-[9px] uppercase font-mono tracking-widest text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded">
-                  ACTIVE
+                  ACTIVO
                 </span>
               </div>
 
@@ -317,23 +323,23 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-neutral-900/40 border border-neutral-900/80 p-5 rounded-xl text-center space-y-1">
                   <p className="text-2xl font-mono font-bold text-white">{user.checkInCount}</p>
-                  <p className="text-[9px] text-neutral-500 uppercase tracking-wider">Weekly Check-Ins</p>
+                  <p className="text-[9px] text-neutral-500 uppercase tracking-wider">Check-Ins de la Semana</p>
                 </div>
                 <div className="bg-neutral-900/40 border border-neutral-900/80 p-5 rounded-xl text-center space-y-1">
                   <p className="text-2xl font-mono font-bold text-brand-gold">
                     {classes.filter((c) => c.booked).length}
                   </p>
-                  <p className="text-[9px] text-neutral-500 uppercase tracking-wider">Booked Classes</p>
+                  <p className="text-[9px] text-neutral-500 uppercase tracking-wider">Sesiones Reservadas</p>
                 </div>
               </div>
 
               {/* Active Program details */}
               <div className="bg-neutral-950 border border-neutral-900 rounded-2xl p-5 space-y-3">
-                <span className="text-[9px] font-mono tracking-widest text-neutral-500 uppercase block">Active Training Program</span>
+                <span className="text-[9px] font-mono tracking-widest text-neutral-500 uppercase block">Programa de Entrenamiento Activo</span>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-white">Dragon Gym Regenerate</h4>
-                    <p className="text-xs text-neutral-400 font-light">Aug 08 - Sep 07</p>
+                    <h4 className="text-sm font-semibold text-white">Regeneración Dragon Gym</h4>
+                    <p className="text-xs text-neutral-400 font-light">08 Ago - 07 Sep</p>
                   </div>
                   <button
                     onClick={() => setActiveTab('programs')}
@@ -344,74 +350,74 @@ export default function App() {
                 </div>
               </div>
 
-              {/* SIMULATOR CONTROLLER SUITE */}
-              <div className="bg-neutral-900/20 border border-neutral-900/60 rounded-2xl p-5 space-y-5">
-                <div className="flex items-center gap-1.5 text-xs font-mono text-brand-gold">
-                  <Sparkles className="w-4 h-4" />
-                  <span>SIMULATOR PREFERENCES</span>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
-                    Simulated Athlete Name
-                  </label>
-                  <input
-                    type="text"
-                    value={user.name}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl px-3.5 py-2.5 focus:border-brand-gold outline-none text-white transition font-medium"
-                    placeholder="e.g. Molly"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
-                    Quick Simulation Shortcuts
-                  </label>
-                  <div className="grid grid-cols-2 gap-1.5 text-xs font-medium">
-                    <button
-                      onClick={() => {
-                        setActiveTab('explore');
-                        const cc = classes.find((c) => c.title.includes('Circuit'));
-                        if (cc) setActiveClass(cc);
-                      }}
-                      className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
-                    >
-                      1. Circuit Class Detail
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveTab('programs');
-                      }}
-                      className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
-                    >
-                      2. View Program
-                    </button>
-                    <button
-                      onClick={() => setShowCheckInModal(true)}
-                      className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
-                    >
-                      3. Club Check-In
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveTab('explore');
-                        setActiveClass(null);
-                      }}
-                      className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
-                    >
-                      4. Class Directory
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleResetState}
-                  className="w-full py-2.5 bg-neutral-950 hover:bg-neutral-900 border border-red-950/40 hover:border-red-950/80 text-red-400 hover:text-red-300 text-xs font-mono font-bold rounded-xl transition flex items-center justify-center gap-2"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" /> Clear Simulator Cache
-                </button>
+            {/* SIMULATOR CONTROLLER SUITE */}
+            <div className="bg-neutral-900/20 border border-neutral-900/60 rounded-2xl p-5 space-y-5">
+              <div className="flex items-center gap-1.5 text-xs font-mono text-brand-gold">
+                <Sparkles className="w-4 h-4" />
+                <span>PREFERENCIAS DE SIMULACIÓN</span>
               </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+                  Nombre de Atleta Simulado
+                </label>
+                <input
+                  type="text"
+                  value={user.name}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl px-3.5 py-2.5 focus:border-brand-gold outline-none text-white transition font-medium"
+                  placeholder="Ej. Molly"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+                  Atajos Rápidos de Simulación
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 text-xs font-medium">
+                  <button
+                    onClick={() => {
+                      setActiveTab('explore');
+                      const cc = classes.find((c) => c.title.includes('Circuit'));
+                      if (cc) setActiveClass(cc);
+                    }}
+                    className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
+                  >
+                    1. Detalle de Sesión Circuit
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('programs');
+                    }}
+                    className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
+                  >
+                    2. Ver Programa
+                  </button>
+                  <button
+                    onClick={() => setShowCheckInModal(true)}
+                    className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
+                  >
+                    3. Check-In de Club
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('explore');
+                      setActiveClass(null);
+                    }}
+                    className="p-2.5 bg-neutral-950 border border-neutral-850 hover:border-neutral-700 rounded-lg text-left text-neutral-300 hover:text-white transition"
+                  >
+                    4. Directorio de Sesiones
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={handleResetState}
+                className="w-full py-2.5 bg-neutral-950 hover:bg-neutral-900 border border-red-950/40 hover:border-red-950/80 text-red-400 hover:text-red-300 text-xs font-mono font-bold rounded-xl transition flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Limpiar Caché de Simulación
+              </button>
+            </div>
 
               {/* Subtle design guidelines reference */}
               <div className="bg-neutral-950/40 border border-neutral-900/60 rounded-xl p-4 space-y-2 text-[10px] text-neutral-500 font-light">
@@ -434,7 +440,7 @@ export default function App() {
           }`}
         >
           <HomeIcon className="w-5 h-5" />
-          <span className="text-[9px] font-medium uppercase tracking-widest">Home</span>
+          <span className="text-[9px] font-medium uppercase tracking-widest">Inicio</span>
         </button>
 
         <button
@@ -444,7 +450,7 @@ export default function App() {
           }`}
         >
           <Compass className="w-5 h-5" />
-          <span className="text-[9px] font-medium uppercase tracking-widest">Explore</span>
+          <span className="text-[9px] font-medium uppercase tracking-widest">Explorar</span>
         </button>
 
         <button
@@ -454,7 +460,7 @@ export default function App() {
           }`}
         >
           <Dumbbell className="w-5 h-5" />
-          <span className="text-[9px] font-medium uppercase tracking-widest">Programs</span>
+          <span className="text-[9px] font-medium uppercase tracking-widest">Programas</span>
         </button>
 
         <button
@@ -464,7 +470,7 @@ export default function App() {
           }`}
         >
           <UserIcon className="w-5 h-5" />
-          <span className="text-[9px] font-medium uppercase tracking-widest">Profile</span>
+          <span className="text-[9px] font-medium uppercase tracking-widest">Cuenta</span>
         </button>
       </div>
 
@@ -600,6 +606,21 @@ export default function App() {
               setUser(updatedUser);
             }}
             onBookToggle={handleBookToggle}
+            onTriggerNotification={(msg) => triggerNotification(msg)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* --- COACH PORTAL OVERLAY --- */}
+      <AnimatePresence>
+        {showCoachPortal && (
+          <CoachPortal
+            classes={classes}
+            user={user}
+            onClose={() => setShowCoachPortal(false)}
+            onUpdateUser={(updatedUser) => {
+              setUser(updatedUser);
+            }}
             onTriggerNotification={(msg) => triggerNotification(msg)}
           />
         )}

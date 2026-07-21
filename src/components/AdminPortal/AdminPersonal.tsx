@@ -34,7 +34,7 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
 
   const [showAddClass, setShowAddClass] = useState(false);
   const [classTitle, setClassTitle] = useState('');
-  const [classCategory, setClassCategory] = useState<'HIIT' | 'Yoga' | 'Pilates' | 'Running' | 'Cycling' | 'Strength'>('HIIT');
+  const [classCategory, setClassCategory] = useState<'HIIT' | 'Funcional' | 'Pilates' | 'Running' | 'Cycling' | 'Strength'>('HIIT');
   const [classInstructor, setClassInstructor] = useState('');
   const [classDuration, setClassDuration] = useState(45);
   const [classTime, setClassTime] = useState('09:00 AM');
@@ -76,7 +76,7 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
 
     const imagesByCategory: Record<string, string> = {
       HIIT: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=600&auto=format&fit=crop',
-      Yoga: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop',
+      Funcional: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop',
       Pilates: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop',
       Running: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=600&auto=format&fit=crop',
       Cycling: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=600&auto=format&fit=crop',
@@ -257,11 +257,11 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
         </div>
       </div>
 
-      {/* 2. Programador de Clases */}
+      {/* 2. Programador de Sesiones */}
       <div className="space-y-4 border-t border-neutral-900/40 pt-8">
         <div className="flex justify-between items-center flex-wrap gap-2">
           <div>
-            <h3 className="text-sm font-semibold text-white font-display uppercase tracking-wide">Programador de Sesiones Grupales</h3>
+            <h3 className="text-sm font-semibold text-white font-display uppercase tracking-wide">Programador de Sesiones</h3>
             <p className="text-xs text-neutral-400">Publica sesiones en vivo en el calendario, asigna coach y limita aforos máximos</p>
           </div>
           <button
@@ -269,7 +269,7 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
             className="bg-white hover:bg-neutral-200 text-black px-4.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
           >
             <Calendar className="w-4 h-4" />
-            <span>Programar Clase</span>
+            <span>Programar Sesión</span>
           </button>
         </div>
 
@@ -285,12 +285,12 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
             >
               <div className="flex items-center gap-1.5 text-xs font-mono text-brand-gold pb-2 border-b border-neutral-950">
                 <Sparkles className="w-4 h-4" />
-                <span>NUEVA SESIÓN GRUPAL EN CALENDARIO</span>
+                <span>NUEVA SESIÓN EN CALENDARIO</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-mono tracking-wider text-neutral-400 block">Nombre de la Clase</label>
+                  <label className="text-[10px] uppercase font-mono tracking-wider text-neutral-400 block">Nombre de la Sesión</label>
                   <input
                     type="text"
                     required
@@ -321,7 +321,7 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
                     className="w-full text-xs bg-neutral-950 border border-neutral-850 rounded-xl p-3 text-white outline-none focus:border-brand-gold"
                   >
                     <option value="HIIT">HIIT</option>
-                    <option value="Yoga">Yoga</option>
+                    <option value="Funcional">Funcional</option>
                     <option value="Pilates">Pilates</option>
                     <option value="Running">Running</option>
                     <option value="Cycling">Cycling</option>
@@ -387,7 +387,7 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
                   type="submit"
                   className="px-5 py-2.5 rounded-xl bg-white hover:bg-neutral-200 text-black font-bold text-xs transition"
                 >
-                  Publicar Clase
+                  Publicar Sesión
                 </button>
               </div>
             </motion.form>
@@ -424,12 +424,12 @@ export default function AdminPersonal({ classes, onAddClass, onDeleteClass, onAd
                 <span className="text-[10px] font-mono text-neutral-500 uppercase">Capacidad: {classCapacity} cupos</span>
                 <button
                   onClick={() => {
-                    if (confirm(`¿Deseas retirar del calendario la clase "${cls.title}"?`)) {
+                    if (confirm(`¿Deseas retirar del calendario la sesión "${cls.title}"?`)) {
                       onDeleteClass(cls.id);
                     }
                   }}
                   className="p-2 bg-neutral-900 hover:bg-neutral-850 rounded-xl text-neutral-500 hover:text-red-400 transition"
-                  title="Retirar Clase"
+                  title="Retirar Sesión"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>

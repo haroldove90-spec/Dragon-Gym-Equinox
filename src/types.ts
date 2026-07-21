@@ -36,7 +36,7 @@ export interface ClassBreakdown {
 export interface GymClass {
   id: string;
   title: string;
-  category: 'HIIT' | 'Yoga' | 'Pilates' | 'Running' | 'Cycling' | 'Strength';
+  category: 'HIIT' | 'Funcional' | 'Pilates' | 'Running' | 'Cycling' | 'Strength';
   instructor: string;
   location: string;
   duration: number; // in minutes

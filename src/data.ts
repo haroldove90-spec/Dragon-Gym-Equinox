@@ -4,59 +4,59 @@ export const mockUserProfile: UserProfile = {
   id: "DG-ATHLETE-7102",
   name: "Molly Jones",
   email: "molly.jones@dragongym.com",
-  phone: "+1 (555) 381-9921",
+  phone: "+52 (55) 3819-9921",
   bloodType: "O+",
-  emergencyContact: "David Jones (Husband) - +1 (555) 381-0022",
+  emergencyContact: "David Jones (Esposo) - +52 (55) 3810-0022",
   avatarLetter: "M",
   checkInCount: 2,
   checkInGoal: 3,
-  membershipLevel: "Destination Access",
-  favoriteClub: "Dragon Gym Hudson Yards"
+  membershipLevel: "Acceso Destino VIP",
+  favoriteClub: "Dragon Gym Polanco"
 };
 
 export const mockArticles: Article[] = [
   {
     id: "art-1",
-    title: "Elevate your game with new styles",
+    title: "Eleva tu rendimiento con nuevos estilos",
     category: "SHOP",
-    subtitle: "From Vuori, Rhone, ASRV, Lululemon and more.",
+    subtitle: "De Vuori, Rhone, ASRV, Lululemon y más.",
     image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=600&auto=format&fit=crop",
-    content: "Discover the newest performance apparel designed to move with you. Dragon Gym curated shops offer exclusive pieces crafted for peak performance, extreme comfort, and effortless transition from sweat to street. Visit the Shop in-club or online to explore the latest drops.",
-    readTime: "3 min read"
+    content: "Descubre la ropa de rendimiento más nueva diseñada para moverse contigo. Las tiendas selectas de Dragon Gym ofrecen prendas exclusivas diseñadas para el máximo rendimiento, comodidad extrema y una transición sin esfuerzo del sudor a la calle. Visita la tienda en el club o en línea para explorar los últimos lanzamientos.",
+    readTime: "Lectura de 3 min"
   },
   {
     id: "art-2",
-    title: "Cabanas Now Open",
+    title: "Cabañas ya abiertas para relajación",
     category: "BENEFIT",
-    subtitle: "Stop by Hudson Yards for sunset views and recovery.",
+    subtitle: "Visita Polanco para disfrutar de vistas al atardecer y recuperación.",
     image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=600&auto=format&fit=crop",
-    content: "Our outdoor roof terrace and cabanas are officially open for the season. Relax after an intense workout with custom wellness juices, dynamic compression boots, or enjoy a panoramic sunset view over the Hudson River. Reserved exclusively for Dragon Gym Members.",
-    readTime: "5 min read"
+    content: "Nuestra terraza al aire libre y cabañas están oficialmente abiertas para la temporada. Relájate después de un entrenamiento intenso con jugos de bienestar personalizados, botas de compresión dinámica o disfruta de una vista panorámica del atardecer sobre el río. Reservado exclusivamente para socios de Dragon Gym.",
+    readTime: "Lectura de 5 min"
   },
   {
     id: "art-3",
-    title: "The Science of Cold Plunge Recovery",
+    title: "La ciencia de la recuperación con inmersión en frío",
     category: "LIFE",
-    subtitle: "How cold exposure triggers dopamine and limits soreness.",
+    subtitle: "Cómo la exposición al frío desencadena dopamina y reduce el dolor muscular.",
     image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=600&auto=format&fit=crop",
-    content: "Cryotherapy and cold plunge systems have become staples of the professional athlete's routine. Research shows that dynamic cold water immersion activates immediate vasoconstriction, washing away lactic acid and accelerating systemic nervous system recovery.",
-    readTime: "4 min read"
+    content: "La crioterapia y los sistemas de inmersión en frío se han convertido en elementos básicos de la rutina de los atletas profesionales. Las investigaciones demuestran que la inmersión dinámica en agua fría activa una vasoconstricción inmediata, eliminando el ácido láctico y acelerando la recuperación del sistema nervioso sistémico.",
+    readTime: "Lectura de 4 min"
   }
 ];
 
 export const mockClasses: GymClass[] = [
   {
     id: "class-1",
-    title: "Circuit Breaker",
+    title: "Rompe Circuitos (Circuit Breaker)",
     category: "HIIT",
     instructor: "Adrianne G.",
-    location: "Studio 1, Hudson Yards",
+    location: "Estudio 1, Polanco",
     duration: 45,
     time: "10:30 AM",
-    date: "Today",
+    date: "Hoy",
     level: "All Levels",
     image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=600&auto=format&fit=crop",
-    description: "Push yourself further with this cardio-charged circuit class as you take on solo and team intervals. Featuring challenging equipment for a full-body workout. A Dragon Gym Exclusive designed to break plates and exceed expectations.",
+    description: "Exígete más en esta clase de circuito cargada de cardio mientras realizas intervalos individuales y en equipo. Cuenta con equipo desafiante para un entrenamiento de cuerpo completo. Una exclusividad de Dragon Gym diseñada para romper récords y superar expectativas.",
     breakdown: {
       strength: 4,
       cardio: 5,
@@ -67,16 +67,16 @@ export const mockClasses: GymClass[] = [
   },
   {
     id: "class-2",
-    title: "MetCon3",
+    title: "Acondicionamiento Metabólico 3 (MetCon3)",
     category: "Strength",
     instructor: "Kaisa K.",
-    location: "Main Floor, Flatiron",
+    location: "Piso Principal, Roma Norte",
     duration: 50,
     time: "12:15 PM",
-    date: "Today",
+    date: "Hoy",
     level: "Intermediate",
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop",
-    description: "A high-octane metabolic conditioning class utilizing ten exercises in three intense blocks. MetCon3 challenges your anaerobic threshold and builds lean functional muscle while keeping your heart rate pegged.",
+    description: "Una clase de acondicionamiento metabólico de alto octanaje que utiliza diez ejercicios en tres bloques intensos. MetCon3 desafía tu umbral anaeróbico y desarrolla músculo funcional magro mientras mantiene tu ritmo cardíaco al máximo.",
     breakdown: {
       strength: 5,
       cardio: 4,
@@ -87,16 +87,16 @@ export const mockClasses: GymClass[] = [
   },
   {
     id: "class-3",
-    title: "Vinyasa Yoga Flow",
-    category: "Yoga",
+    title: "Flexibilidad y Fuerza Funcional",
+    category: "Funcional",
     instructor: "Elena B.",
-    location: "Mind Body Studio, Hudson Yards",
+    location: "Estudio Mente y Cuerpo, Polanco",
     duration: 60,
     time: "08:30 AM",
-    date: "Tomorrow",
+    date: "Mañana",
     level: "All Levels",
     image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop",
-    description: "Connect breath and dynamic movement in a carefully flowing sequence. Expect core engagement, mindful stretching, and an extended ambient sound bath finish to balance high-intensity athletic training.",
+    description: "Conecta la respiración y el movimiento dinámico en una secuencia de acondicionamiento físico cuidadosamente fluida. Espera un trabajo activo de core, estiramientos conscientes y un final de baño de sonido ambiental para equilibrar el entrenamiento de alta intensidad.",
     breakdown: {
       strength: 3,
       cardio: 2,
@@ -107,16 +107,16 @@ export const mockClasses: GymClass[] = [
   },
   {
     id: "class-4",
-    title: "Precision Run (PR)",
+    title: "Carrera de Precisión (Precision Run)",
     category: "Running",
     instructor: "Oliver R.",
-    location: "Treadmill Zone, Hudson Yards",
+    location: "Zona de Caminadoras, Polanco",
     duration: 45,
     time: "07:00 AM",
-    date: "Today",
+    date: "Hoy",
     level: "All Levels",
     image: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=600&auto=format&fit=crop",
-    description: "A customized treadmill training interval class designed to optimize strike pattern, VO2 max, and running speed. Uses the custom Woodway curved treadmills for low impact and massive power output.",
+    description: "Una clase de intervalos de entrenamiento en caminadora personalizada diseñada para optimizar el patrón de pisada, el VO2 máx. y la velocidad de carrera. Utiliza caminadoras curvas Woodway personalizadas para un bajo impacto y un gran rendimiento de potencia.",
     breakdown: {
       strength: 2,
       cardio: 5,
@@ -127,16 +127,16 @@ export const mockClasses: GymClass[] = [
   },
   {
     id: "class-5",
-    title: "Anthem Ride",
+    title: "Rodada Anthem (Anthem Ride)",
     category: "Cycling",
     instructor: "Trey M.",
-    location: "Cycling Theater, Soho",
+    location: "Teatro de Ciclismo, Santa Fe",
     duration: 45,
     time: "06:15 PM",
-    date: "Tomorrow",
+    date: "Mañana",
     level: "Advanced",
     image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
-    description: "A rhythmic cycling session centered around deep beats and high resistance climbs. Connect with the energy of the room inside our light-controlled acoustic dome for an intense physical release.",
+    description: "Una sesión de ciclismo rítmico centrada en ritmos profundos y subidas de alta resistencia. Conéctate con la energía de la sala dentro de nuestro domo acústico con control de luz para una liberación física intensa.",
     breakdown: {
       strength: 3,
       cardio: 5,
@@ -150,103 +150,103 @@ export const mockClasses: GymClass[] = [
 export const mockPrograms: Program[] = [
   {
     id: "prog-1",
-    title: "Dragon Gym Regenerate",
-    subtitle: "Reach your goals with a complimentary, personalized custom program.",
-    startDate: "Aug 08",
-    endDate: "Sep 07",
+    title: "Regeneración Dragon Gym",
+    subtitle: "Alcanza tus metas con un programa de cortesía personalizado.",
+    startDate: "08 Ago",
+    endDate: "07 Sep",
     image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop",
     isActive: true,
     sessions: [
       {
         id: "sess-1",
-        title: "Cable Hip Abduction",
-        type: "Full Body Strength",
+        title: "Abducción de Cadera en Polea",
+        type: "Fuerza de Cuerpo Completo",
         duration: 25,
         movesCount: 4,
         completed: false,
         thumbnail: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=200&auto=format&fit=crop",
         moves: [
           {
-            name: "Cable Standing Hip Abduction",
+            name: "Abducción de Cadera de Pie en Polea",
             reps: "12 reps",
             sets: 3,
-            description: "Attach low cable to outer ankle. Stand tall holding the upright, brace your core, and abduct leg to side slowly."
+            description: "Sujeta la polea baja al tobillo externo. Párate derecho sosteniendo el soporte, activa el abdomen y abduce la pierna hacia el lado lentamente."
           },
           {
-            name: "Kettlebell Romanian Deadlift",
+            name: "Peso Muerto Rumano con Pesa Rusa",
             reps: "10 reps",
             sets: 4,
-            description: "Keep feet hip-width apart. Hinge back at your hips, keeping a flat back, and squeeze glutes to return."
+            description: "Mantén los pies a la anchura de las caderas. Haz una bisagra hacia atrás con las caderas, manteniendo la espalda recta, y aprieta los glúteos al regresar."
           },
           {
-            name: "Dumbbell Renegade Row",
-            reps: "8 reps/side",
+            name: "Remo Renegado con Mancuernas",
+            reps: "8 reps por lado",
             sets: 3,
-            description: "Start in pushup position on hex dumbbells. Row one dumbbell to hip pocket without rotating pelvis."
+            description: "Comienza en posición de lagartija sobre mancuernas hexagonales. Lleva una mancuerna a la cadera sin rotar la pelvis."
           },
           {
-            name: "Stability Ball Stir-the-Pot",
-            reps: "30 seconds",
+            name: "Plancha Dinámica en Pelota de Estabilidad",
+            reps: "30 segundos",
             sets: 3,
-            description: "In a forearm plank on stability ball, draw small circles with your elbows while maintaining spine position."
+            description: "En plancha sobre antebrazos en pelota de estabilidad, dibuja pequeños círculos con los codos mientras mantienes la posición de la columna."
           }
         ]
       },
       {
         id: "sess-2",
-        title: "Mobility & Flow Restore",
-        type: "Dynamic Flexibility",
+        title: "Restauración de Movilidad y Flujo",
+        type: "Flexibilidad Dinámica",
         duration: 20,
         movesCount: 3,
         completed: false,
         thumbnail: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=200&auto=format&fit=crop",
         moves: [
           {
-            name: "World's Greatest Stretch",
-            reps: "5 reps/side",
+            name: "El Mejor Estiramiento del Mundo",
+            reps: "5 reps por lado",
             sets: 3,
-            description: "Deep lunge with back knee up, rotate elbow down inside ankle, then open arm up towards the sky."
+            description: "Desplante profundo con la rodilla de atrás levantada, gira el codo hacia abajo por dentro del tobillo, luego abre el brazo hacia el cielo."
           },
           {
-            name: "90/90 Hip Swivels",
-            reps: "8 reps/side",
+            name: "Giro de Caderas 90/90",
+            reps: "8 reps por lado",
             sets: 3,
-            description: "Sit on floor with knees bent at 90 degrees in front and side. Swivel hips side-to-side dynamically."
+            description: "Siéntate en el suelo con las rodillas dobladas a 90 grados al frente y de lado. Gira las caderas de lado a lado dinámicamente."
           },
           {
-            name: "Thoracic Foam Roller Extension",
-            reps: "10 gentle extensions",
+            name: "Extensión Torácica con Rodillo de Espuma",
+            reps: "10 extensiones suaves",
             sets: 3,
-            description: "Support your neck and arch midback over foam roller while keeping hips on the ground."
+            description: "Sostén tu cuello y arquea la espalda media sobre el rodillo de espuma mientras mantienes las caderas en el suelo."
           }
         ]
       },
       {
         id: "sess-3",
-        title: "Aerobic Capacity Burn",
-        type: "HIIT Endurance",
+        title: "Quema de Capacidad Aeróbica",
+        type: "Resistencia HIIT",
         duration: 35,
         movesCount: 3,
         completed: false,
         thumbnail: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=200&auto=format&fit=crop",
         moves: [
           {
-            name: "Air Assault Bike Sprints",
-            reps: "20s on / 40s rest",
+            name: "Sprints en Bicicleta de Aire Assault",
+            reps: "20s activo / 40s descanso",
             sets: 10,
-            description: "Max effort sprint on air assault bike, pushing and pulling handles with max leg speed."
+            description: "Sprint de máximo esfuerzo en bicicleta de aire, empujando y jalando los manubrios con la máxima velocidad de piernas."
           },
           {
-            name: "Dumbbell Goblet Squat",
+            name: "Sentadilla Goblet con Mancuerna",
             reps: "15 reps",
             sets: 4,
-            description: "Hold heavy DB vertically at chest, sit deep past parallel, push through heels to stand."
+            description: "Sostiene una mancuerna pesada verticalmente en el pecho, baja profundamente pasando el paralelo, empuja con los talones para ponerte de pie."
           },
           {
-            name: "Hanging Leg Raises",
+            name: "Elevaciones de Piernas Colgado",
             reps: "10 reps",
             sets: 3,
-            description: "Hang from pull-up bar, raise feet to bar keeping legs as straight as possible, controlled descent."
+            description: "Cuélgate de la barra de dominadas, eleva los pies hacia la barra manteniendo las piernas lo más rectas posible, descenso controlado."
           }
         ]
       }
@@ -255,12 +255,12 @@ export const mockPrograms: Program[] = [
 ];
 
 export const exploreCategories = [
-  { name: "In-Club Classes", image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=400&auto=format&fit=crop", filter: "In-Club" },
-  { name: "On-Demand Classes", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop", filter: "On-Demand" },
-  { name: "Events", image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop", filter: "Events" },
-  { name: "Collections", image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=400&auto=format&fit=crop", filter: "Collections" },
-  { name: "Articles", image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=400&auto=format&fit=crop", filter: "Articles" },
-  { name: "Programs by Dragon Gym", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=400&auto=format&fit=crop", filter: "Programs" },
-  { name: "Movement Library", image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=400&auto=format&fit=crop", filter: "Library" },
-  { name: "Studio Pilates", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=400&auto=format&fit=crop", filter: "Pilates" }
+  { name: "Clases en el Club", image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=400&auto=format&fit=crop", filter: "In-Club" },
+  { name: "Clases On-Demand", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop", filter: "On-Demand" },
+  { name: "Eventos", image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=400&auto=format&fit=crop", filter: "Events" },
+  { name: "Colecciones", image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=400&auto=format&fit=crop", filter: "Collections" },
+  { name: "Artículos", image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=400&auto=format&fit=crop", filter: "Articles" },
+  { name: "Programas Dragon Gym", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=400&auto=format&fit=crop", filter: "Programs" },
+  { name: "Biblioteca de Movimientos", image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=400&auto=format&fit=crop", filter: "Library" },
+  { name: "Estudio de Pilates", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=400&auto=format&fit=crop", filter: "Pilates" }
 ];
